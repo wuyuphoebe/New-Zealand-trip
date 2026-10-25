@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>紐西蘭 11 天之旅 - 互動編輯行程表</title>
+    <title>紐西蘭 11 天自駕之旅 - 互動編輯行程表</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome Icons -->
@@ -33,6 +33,7 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         .bg-pattern { background-color: #f8fafc; background-image: radial-gradient(#cbd5e1 0.75px, transparent 0.75px); background-size: 16px 16px; }
+        .preserve-newlines { white-space: pre-line; }
     </style>
 </head>
 <body class="bg-pattern text-slate-800 min-h-screen pb-24">
@@ -171,7 +172,7 @@
             <!-- Dynamic Items Injection -->
         </section>
 
-        <!-- Add Activity Button (Visible in Edit Mode or Bottom) -->
+        <!-- Add Activity Button (Visible in Edit Mode) -->
         <div id="add-item-bar" class="hidden pt-4 pb-8 text-center">
             <button onclick="addNewActivity()" class="w-full py-3.5 border-2 border-dashed border-emerald-400 bg-emerald-50/50 hover:bg-emerald-100/50 text-emerald-700 font-bold text-sm rounded-2xl flex items-center justify-center gap-2 transition-all shadow-sm">
                 <i class="fa-solid fa-circle-plus text-base"></i> 新增行程項目 (+ Add Item)
@@ -187,41 +188,25 @@
 
     <!-- English Phrase Prompt Fullscreen Modal -->
     <div id="phrase-modal" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-6 relative border border-slate-100 animate-in zoom-in-95 duration-200">
+        <div class="bg-white rounded-3xl max-w-xl w-full p-6 shadow-2xl space-y-5 relative border border-slate-100 animate-in zoom-in-95 duration-200 max-h-[90vh] flex flex-col">
             <!-- Modal Header -->
             <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                 <div class="flex items-center gap-2">
-                    <span class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold">💬</span>
-                    <h3 class="font-bold text-slate-800 text-base">英文對話卡 (English Card)</h3>
+                    <span class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-sm font-bold">💬</span>
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-base" id="phrase-modal-title">實用英文對話例句</h3>
+                        <p class="text-[11px] text-slate-400">點擊朗讀直接播放給外籍人員聽，或點擊複製</p>
+                    </div>
                 </div>
                 <button onclick="closePhraseModal()" class="w-8 h-8 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-600 flex items-center justify-center">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
 
-            <!-- Chinese Context -->
-            <div id="phrase-modal-cn" class="text-sm font-medium text-slate-500 bg-slate-50 p-3 rounded-xl border border-slate-100">
-                對話情境提示
+            <!-- List of Phrases -->
+            <div id="phrase-modal-list" class="overflow-y-auto space-y-3 pr-1 flex-1">
+                <!-- Dynamic injection of phrase cards -->
             </div>
-
-            <!-- Big English Phrase Display -->
-            <div class="bg-gradient-to-br from-blue-50 to-indigo-50/50 rounded-2xl p-6 border border-blue-100 text-center relative group">
-                <p id="phrase-modal-en" class="text-2xl sm:text-3xl font-black text-slate-900 tracking-wide leading-relaxed select-all">
-                    "Hi, I have a reservation under Wu."
-                </p>
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="grid grid-cols-2 gap-3 pt-2">
-                <button onclick="speakPhrase()" class="py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-sm flex items-center justify-center gap-2 shadow-md transition-all active:scale-95">
-                    <i class="fa-solid fa-volume-high"></i> 朗讀聲音 (Speak)
-                </button>
-                <button onclick="copyPhraseText()" class="py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-sm flex items-center justify-center gap-2 transition-all active:scale-95">
-                    <i class="fa-solid fa-copy"></i> 複製文字 (Copy)
-                </button>
-            </div>
-
-            <p class="text-[11px] text-center text-slate-400">點擊朗讀可直接發音給租車處、飯店櫃檯或海關聽</p>
         </div>
     </div>
 
@@ -233,7 +218,7 @@
 
     <!-- Application Script -->
     <script>
-        // Default Initial 11-Day New Zealand Itinerary Data
+        // Default Initial 11-Day New Zealand Itinerary Data with Multiple Phrases and Attachments
         const DEFAULT_ITINERARY = {
             days: [
                 {
@@ -241,11 +226,81 @@
                     title: "基督城抵達與市區探索",
                     lodging: "Novotel Christchurch Cathedral Square",
                     items: [
-                        { id: "101", time: "09:30", category: "交通", title: "抵達基督城國際機場 (CHC)", notes: "領取行李，預備至租車櫃檯辦理手續", mapQuery: "Christchurch International Airport", englishPhrase: "Hi, I am here to pick up my rental car under Wu.", estCost: 0 },
-                        { id: "102", time: "11:00", category: "交通", title: "Apex / Hertz 租車公司領車", notes: "檢查車身刮痕、確認保險內容與兒童座椅", mapQuery: "Apex Car Rentals Christchurch Airport", englishPhrase: "Could you please confirm if full cover insurance is included?", estCost: 450 },
-                        { id: "12:30", category: "美食", title: "C4 Coffee 午餐與精緻咖啡", notes: "紐西蘭著名精品咖啡，推薦點 Flat White 與特製早午餐", mapQuery: "C4 Coffee Christchurch", englishPhrase: "Could we get two Flat Whites and the lunch menu, please?", estCost: 45 },
-                        { id: "14:30", category: "景點", title: "紙教堂 (Cardboard Cathedral) & 追憶橋", notes: "參觀震後重建的特色紙教堂與雅芳河畔漫步", mapQuery: "Cardboard Cathedral Christchurch", englishPhrase: "Excuse me, what time does the cathedral close today?", estCost: 0 },
-                        { id: "18:00", category: "住宿", title: "Novotel 飯店 Check-in & 市區晚餐", notes: "入住市中心飯店，準備明日開往蒂卡波湖", mapQuery: "Novotel Christchurch Cathedral Square", englishPhrase: "Hi, we have a reservation for tonight under Wu.", estCost: 220 }
+                        { 
+                            id: "101", 
+                            time: "09:30", 
+                            category: "交通", 
+                            title: "抵達基督城國際機場 (CHC)", 
+                            notes: "領取行李，預備至租車櫃檯辦理手續\n記得預先填寫紐西蘭入境申報 (NZTD)", 
+                            mapQuery: "Christchurch International Airport", 
+                            phrases: [
+                                { label: "海關申報詢問", text: "Hi, I have declared food and hiking shoes in my NZTD form." },
+                                { label: "詢問行李轉盤", text: "Excuse me, which baggage carousel is for flight NZ101?" }
+                            ],
+                            attachments: [
+                                { type: "link", name: "紐西蘭入境申報 NZTD 官網", url: "https://www.nztd.govt.nz/" },
+                                { type: "link", name: "基督城機場平面地圖", url: "https://www.christchurchairport.co.nz/" }
+                            ],
+                            estCost: 0 
+                        },
+                        { 
+                            id: "102", 
+                            time: "11:00", 
+                            category: "交通", 
+                            title: "Apex / Hertz 租車公司領車", 
+                            notes: "檢查車身刮痕、確認保險內容與兒童座椅/雪鍊", 
+                            mapQuery: "Apex Car Rentals Christchurch Airport", 
+                            phrases: [
+                                { label: "取車核對", text: "Hi, I am here to pick up my rental car reserved under Wu." },
+                                { label: "確認全險 coverage", text: "Could you please confirm if full cover insurance zero excess is included?" },
+                                { label: "詢問加油規格", text: "Does this car take Unleaded 91 or 95 petrol?" }
+                            ],
+                            attachments: [
+                                { type: "link", name: "紐西蘭自駕交規教學 (AA NZ)", url: "https://www.aa.co.nz/drivers/driving-school-and-training/visiting-driver/" }
+                            ],
+                            estCost: 450 
+                        },
+                        { 
+                            id: "103", 
+                            time: "12:30", 
+                            category: "美食", 
+                            title: "C4 Coffee 午餐與精緻咖啡", 
+                            notes: "紐西蘭著名精品咖啡，推薦點 Flat White 與特製早午餐", 
+                            mapQuery: "C4 Coffee Christchurch", 
+                            phrases: [
+                                { label: "點餐與咖啡", text: "Could we get two Flat Whites with oat milk and the lunch menu, please?" },
+                                { label: "結帳詢問", text: "Can we pay separately or together?" }
+                            ],
+                            attachments: [],
+                            estCost: 45 
+                        },
+                        { 
+                            id: "104", 
+                            time: "14:30", 
+                            category: "景點", 
+                            title: "紙教堂 (Cardboard Cathedral) & 追憶橋", 
+                            notes: "參觀震後重建的特色紙教堂與雅芳河畔漫步", 
+                            mapQuery: "Cardboard Cathedral Christchurch", 
+                            phrases: [
+                                { label: "開放時間詢問", text: "Excuse me, what time does the cathedral close today?" }
+                            ],
+                            attachments: [],
+                            estCost: 0 
+                        },
+                        { 
+                            id: "105", 
+                            time: "18:00", 
+                            category: "住宿", 
+                            title: "Novotel 飯店 Check-in & 市區晚餐", 
+                            notes: "入住市中心飯店，準備明日開往蒂卡波湖", 
+                            mapQuery: "Novotel Christchurch Cathedral Square", 
+                            phrases: [
+                                { label: "辦理入住", text: "Hi, we have a reservation for tonight under Wu." },
+                                { label: "停車位置詢問", text: "Where is the guest parking area located?" }
+                            ],
+                            attachments: [],
+                            estCost: 220 
+                        }
                     ]
                 },
                 {
@@ -253,109 +308,61 @@
                     title: "基督城 ➔ 蒂卡波湖 (Lake Tekapo) 夢幻藍湖",
                     lodging: "Peppers Bluewater Resort Tekapo",
                     items: [
-                        { id: "201", time: "08:30", category: "交通", title: "出發開往 Lake Tekapo", notes: "車程約 3 小時 15 分鐘，沿途景色寬廣", mapQuery: "Lake Tekapo", englishPhrase: "Where is the nearest gas station before entering Highway 79?", estCost: 60 },
-                        { id: "12:00", category: "美食", title: "Fairlie Bakehouse 吃超人氣肉餅", notes: "紐西蘭第一肉餅店！推薦鮭魚鮮蝦餅或鮭魚起司餅", mapQuery: "Fairlie Bakehouse", englishPhrase: "Could I have one Salmon & Bacon pie, please?", estCost: 25 },
-                        { id: "14:30", category: "景點", title: "好牧羊人教堂 (Church of the Good Shepherd)", notes: "湖畔經典石造教堂，拍蒂卡波牛奶藍湖景", mapQuery: "Church of the Good Shepherd Tekapo", englishPhrase: "Is photos allowed inside the church?", estCost: 0 },
-                        { id: "16:30", category: "景點", title: "Mount John 天文台咖啡廳 (Astra Cafe)", notes: "俯瞰 Lake Tekapo 全景與 Lake McGregor", mapQuery: "Astra Cafe Mt John", englishPhrase: "Could we sit near the window to view the lake?", estCost: 15 },
-                        { id: "21:30", category: "景點", title: "Tekapo 觀星體驗 (Dark Sky Project)", notes: "世界級暗空保護區，觀賞銀河與南十字星", mapQuery: "Dark Sky Project Tekapo", englishPhrase: "We booked the 9:30 PM stargazing tour.", estCost: 180 }
-                    ]
-                },
-                {
-                    dayNum: 3,
-                    title: "蒂卡波湖 ➔ 庫克山國家公園 (Mt Cook)",
-                    lodging: "The Hermitage Hotel Mt Cook",
-                    items: [
-                        { id: "301", time: "09:00", category: "景點", title: "Peter's Lookout 庫克山公路觀景點", notes: "經典公路拍照點，拍攝 Lake Pukaki 與遠處雪山", mapQuery: "Peters Lookout Lake Pukaki", englishPhrase: "Could you take a photo of us with the lake background, please?", estCost: 0 },
-                        { id: "10:30", category: "美食", title: "Mt Cook Alpine Salmon 鮭魚農場", notes: "品嚐極致冰川水養殖高山鮭魚生魚片", mapQuery: "Mt Cook Alpine Salmon Shop", englishPhrase: "One fresh sashimi pack, please.", estCost: 35 },
-                        { id: "12:30", category: "景點", title: "胡克谷步道 (Hooker Valley Track) 健行", notes: "全程來回約 3 小時，過 3 座吊橋直達冰川湖", mapQuery: "Hooker Valley Track", englishPhrase: "How long is the walk to the final glacier lake?", estCost: 0 },
-                        { id: "17:30", category: "住宿", title: "Hermitage Hotel Check-in & 晚餐", notes: "入住隱士飯店，房間可直接遙望庫克山峰", mapQuery: "The Hermitage Hotel Mt Cook", englishPhrase: "Does this room have a Mount Cook view?", estCost: 380 }
-                    ]
-                },
-                {
-                    dayNum: 4,
-                    title: "庫克山 ➔ 瓦納卡 (Wanaka)",
-                    lodging: "Edgewater Hotel Wanaka",
-                    items: [
-                        { id: "401", time: "09:30", category: "景點", title: "塔斯曼冰川 (Tasman Glacier) 景觀步道", notes: "短程健行俯瞰 Tasman 冰川與冰塊", mapQuery: "Tasman Glacier Car Park", englishPhrase: "Is the track open today?", estCost: 0 },
-                        { id: "12:00", category: "交通", title: "穿過 Lindis Pass 陵林高地前往 Wanaka", notes: "壯觀的地貌景致，適合路邊停車拍照", mapQuery: "Lindis Pass Viewpoint", englishPhrase: "Where is the safe pull-over area for photos?", estCost: 40 },
-                        { id: "15:00", category: "景點", title: "瓦納卡孤獨樹 (That Wanaka Tree)", notes: "湖中獨特孤樹，夕陽時分特別動人", mapQuery: "That Wanaka Tree", englishPhrase: "Where is the best spot to view the tree?", estCost: 0 },
-                        { id: "18:00", category: "美食", title: "Bistro Gentil 法式湖景餐廳晚餐", notes: "享受 Wanaka 湖畔精緻料理與紐西蘭葡萄酒", mapQuery: "Bistro Gentil Wanaka", englishPhrase: "Do you have a table for two available for dinner?", estCost: 130 }
-                    ]
-                },
-                {
-                    dayNum: 5,
-                    title: "瓦納卡 ➔ 皇后鎮 (Queenstown)",
-                    lodging: "Heritage Queenstown Hotel",
-                    items: [
-                        { id: "501", time: "09:00", category: "景點", title: "Roys Peak 健行 OR 瓦納卡湖畔散步", notes: "體力佳者可挑戰 Roys Peak (來回5-6hr)", mapQuery: "Roys Peak Track", englishPhrase: "Is the Roys Peak track steep?", estCost: 0 },
-                        { id: "12:30", category: "美食", title: "Cardrona Hotel 歷史古蹟酒吧午餐", notes: "行經 Crown Range Road 途中的紐西蘭最古老飯店", mapQuery: "Cardrona Hotel", englishPhrase: "Can we order lunch at the garden courtyard?", estCost: 50 },
-                        { id: "15:30", category: "景點", title: "箭鎮 (Arrowtown) 白金漢街散步", notes: "淘金小鎮巡禮，漫步古色古香街道與咖啡館", mapQuery: "Buckingham Street Arrowtown", englishPhrase: "Where is the historic Chinese Settlement located?", estCost: 0 },
-                        { id: "18:00", category: "美食", title: "Fergburger 皇后鎮漢堡神店", notes: "必吃比臉還大的 Fergburger，推薦 Big Al 或 Little Bambi", mapQuery: "Fergburger Queenstown", englishPhrase: "I'd like one Ferg Deluxe hamburger to go, please.", estCost: 22 }
-                    ]
-                },
-                {
-                    dayNum: 6,
-                    title: "皇后鎮高空纜車 & 滑板車極限體驗",
-                    lodging: "Heritage Queenstown Hotel",
-                    items: [
-                        { id: "601", time: "09:30", category: "景點", title: "Skyline Cable Car 纜車升空", notes: "搭乘纜車登頂 Bob's Peak 俯瞰瓦卡蒂普湖全景", mapQuery: "Skyline Queenstown", englishPhrase: "Here is our voucher for the Cable Car and 3 Luge rides.", estCost: 85 },
-                        { id: "11:00", category: "景點", title: "Skyline Luge 斜坡滑板車 (狂飆 3 次)", notes: "超刺激超好玩的斜坡滑車，老少咸宜", mapQuery: "Skyline Queenstown Luge", englishPhrase: "Which lane is for beginners?", estCost: 0 },
-                        { id: "13:00", category: "美食", title: "Stratosfare Queenstown 自助午餐", notes: "邊享受無敵湖景邊享用頂級紐西蘭海鮮 Buffet", mapQuery: "Stratosfare Restaurant Queenstown", englishPhrase: "Reservation under Wu for two people.", estCost: 120 },
-                        { id: "16:00", category: "景點", title: "瓦卡蒂普湖畔 TSS 蒸汽船巡航", notes: "百年歷史古董蒸汽船 TSS Earnslaw 遊湖", mapQuery: "TSS Earnslaw Queenstown", englishPhrase: "Where is the boarding dock for TSS Earnslaw?", estCost: 90 }
-                    ]
-                },
-                {
-                    dayNum: 7,
-                    title: "皇后鎮 ➔ 米佛峽灣 (Milford Sound) 1日遊",
-                    lodging: "Heritage Queenstown Hotel",
-                    items: [
-                        { id: "701", time: "07:00", category: "交通", title: "出發前往米佛峽灣 (或搭乘觀光巴士/直昇機)", notes: "行經 94 號公路，途經鏡湖 (Mirror Lakes) 與 Homer Tunnel", mapQuery: "Milford Sound Visitor Centre", englishPhrase: "Is the road to Milford Sound clear of ice today?", estCost: 120 },
-                        { id: "11:30", category: "景點", title: "Milford Sound 峽灣觀光遊船", notes: "近距離欣賞瀑布、壯麗峽灣與海豹棲息地", mapQuery: "RealNZ Milford Sound Cruises", englishPhrase: "Where do we check in for the Milford Sound cruise?", estCost: 160 },
-                        { id: "14:30", category: "交通", title: "返程返回皇后鎮", notes: "途中可於 Te Anau 蒂阿瑙休息購買鹿肉餡餅", mapQuery: "Te Anau", englishPhrase: "Is there a restroom around here?", estCost: 0 },
-                        { id: "19:00", category: "美食", title: "Flame Bar & Grill 碳烤豬脅排晚餐", notes: "皇后鎮極具人氣的美味碳烤肋排餐廳", mapQuery: "Flame Bar & Grill Queenstown", englishPhrase: "Table for two under Wu at 7 PM.", estCost: 110 }
-                    ]
-                },
-                {
-                    dayNum: 8,
-                    title: "皇后鎮 ➔ 奧克蘭 (飛往北島)",
-                    lodging: "SkyCity Hotel Auckland",
-                    items: [
-                        { id: "801", time: "10:00", category: "交通", title: "皇后鎮機場 (ZQN) 還車與登機", notes: "飛往紐西蘭第一大城奧克蘭 (Auckland, AKL)", mapQuery: "Queenstown Airport", englishPhrase: "Where can I drop off the rental car keys?", estCost: 180 },
-                        { id: "14:00", category: "交通", title: "抵達奧克蘭 Airport ➔ 領取北島租車", notes: "辦理手續開往奧克蘭市中心", mapQuery: "Auckland Airport", englishPhrase: "Hi, picking up the vehicle reserved for Wu.", estCost: 350 },
-                        { id: "16:00", category: "景點", title: "天空塔 (Sky Tower) 展望台", notes: "登上 220 公尺高觀景台俯瞰奧克蘭港灣", mapQuery: "Sky Tower Auckland", englishPhrase: "Two adult tickets for the observation deck, please.", estCost: 40 },
-                        { id: "18:30", category: "美食", title: "Depot Eatery 紐西蘭生蠔海鮮吧", notes: "名廚 Al Brown 開設，極致新鮮的生蠔與海鮮盤", mapQuery: "Depot Eatery Auckland", englishPhrase: "A dozen fresh oysters and two glasses of Sauvignon Blanc, please.", estCost: 140 }
-                    ]
-                },
-                {
-                    dayNum: 9,
-                    title: "奧克蘭 ➔ 懷托摩螢火蟲洞 ➔ 羅托路亞",
-                    lodging: "Pullman Rotorua",
-                    items: [
-                        { id: "901", time: "08:30", category: "交通", title: "開車前往懷托摩 (Waitomo)", notes: "車程約 2.5 小時，直達世界奇景螢火蟲洞", mapQuery: "Waitomo Glowworm Caves", englishPhrase: "How long does the guided cave boat tour take?", estCost: 50 },
-                        { id: "11:30", category: "景點", title: "懷托摩藍光螢火蟲洞 (Waitomo Caves)", notes: "搭乘小船進入黑洞，欣賞滿天星斗般的藍光螢火蟲", mapQuery: "Waitomo Glowworm Caves", englishPhrase: "We have tickets for the 11:30 AM tour.", estCost: 75 },
-                        { id: "14:30", category: "交通", title: "前往羅托路亞 (Rotorua) 毛利文化之鄉", notes: "感受地熱煙霧與獨特毛利文化", mapQuery: "Rotorua", englishPhrase: "Which way to Polynesian Spa?", estCost: 0 },
-                        { id: "17:00", category: "景點", title: "Polynesian Spa 玻里尼西亞地熱溫泉", notes: "紐西蘭 Top 10 溫泉，泡湯欣賞 Lake Rotorua 湖景", mapQuery: "Polynesian Spa Rotorua", englishPhrase: "Two lake view private pool entry tickets, please.", estCost: 70 }
-                    ]
-                },
-                {
-                    dayNum: 10,
-                    title: "羅托路亞 ➔ 哈比村 (Hobbiton) ➔ 奧克蘭",
-                    lodging: "SkyCity Hotel Auckland",
-                    items: [
-                        { id: "1001", time: "09:00", category: "景點", title: "Te Puia 蒂普亞地熱公園 & 毛利文化", notes: "觀賞間歇泉 Pohutu Geyser 與紐西蘭國寶國鳥奇威鳥 (Kiwi)", mapQuery: "Te Puia Rotorua", englishPhrase: "What time is the next Pohutu Geyser eruption expected?", estCost: 80 },
-                        { id: "12:30", category: "交通", title: "開車前往瑪塔瑪塔 (Matamata) 哈比村", notes: "車程約 1 小時", mapQuery: "Hobbiton Movie Set", englishPhrase: "Where is the tour departure bus stop?", estCost: 20 },
-                        { id: "14:00", category: "景點", title: "哈比村 Movie Set (Hobbiton) 導覽", notes: "魔戒與哈比人電影場景，綠龍客棧免費享用特製啤酒", mapQuery: "Hobbiton Movie Set", englishPhrase: "Here are our Hobbiton tour confirmation vouchers.", estCost: 120 },
-                        { id: "18:00", category: "交通", title: "返回奧克蘭市區 & 告別晚餐", notes: "結束北島地熱與魔戒夢幻之旅", mapQuery: "SkyCity Hotel Auckland", englishPhrase: "Could we have a table for the final dinner?", estCost: 150 }
-                    ]
-                },
-                {
-                    dayNum: 11,
-                    title: "奧克蘭市區採買 ➔ 奧克蘭機場 ➔ 賦歸",
-                    lodging: "溫馨的家 Home",
-                    items: [
-                        { id: "1101", time: "10:00", category: "景點", title: "皇后街 (Queen St) & 港區 (Viaduct Basin)", notes: "採買紐西蘭綿羊油、麥盧卡蜂蜜 (Manuka Honey) 與 Whittakers 巧克力", mapQuery: "Queen Street Auckland", englishPhrase: "Do you offer tax-free shopping for international tourists?", estCost: 100 },
-                        { id: "13:00", category: "美食", title: "Auckland Fish Market 魚市場午餐", notes: "享用炸魚薯條 (Fish & Chips) 與龍蝦濃湯", mapQuery: "Auckland Fish Market", englishPhrase: "One classic Fish & Chips combo with tartar sauce, please.", estCost: 35 },
-                        { id: "15:30", category: "交通", title: "前往奧克蘭國際機場還車與 Check-in", notes: "辦理租車歸還手續，前往航廈辦理托運與出境", mapQuery: "Auckland International Airport", englishPhrase: "Where is the luggage drop-off counter for flight NZ101?", estCost: 30 }
+                        { 
+                            id: "201", 
+                            time: "08:30", 
+                            category: "交通", 
+                            title: "出發開往 Lake Tekapo", 
+                            notes: "車程約 3 小時 15 分鐘，沿途景色寬廣，注意速限 100 km/h", 
+                            mapQuery: "Lake Tekapo", 
+                            phrases: [
+                                { label: "加油站地點", text: "Where is the nearest gas station along Highway 79?" }
+                            ],
+                            attachments: [],
+                            estCost: 60 
+                        },
+                        { 
+                            id: "202", 
+                            time: "12:00", 
+                            category: "美食", 
+                            title: "Fairlie Bakehouse 吃超人氣肉餅", 
+                            notes: "紐西蘭第一肉餅店！推薦鮭魚鮮蝦餅或豬腳起司餅", 
+                            mapQuery: "Fairlie Bakehouse", 
+                            phrases: [
+                                { label: "點肉餅", text: "Could I have one Pork & Apple pie and one Salmon pie, please?" }
+                            ],
+                            attachments: [],
+                            estCost: 25 
+                        },
+                        { 
+                            id: "203", 
+                            time: "14:30", 
+                            category: "景點", 
+                            title: "好牧羊人教堂 (Church of the Good Shepherd)", 
+                            notes: "湖畔經典石造教堂，拍蒂卡波牛奶藍湖景", 
+                            mapQuery: "Church of the Good Shepherd Tekapo", 
+                            phrases: [
+                                { label: "合照請託", text: "Could you take a photo of us with the lake in the background, please?" }
+                            ],
+                            attachments: [],
+                            estCost: 0 
+                        },
+                        { 
+                            id: "204", 
+                            time: "21:30", 
+                            category: "景點", 
+                            title: "Tekapo 觀星體驗 (Dark Sky Project)", 
+                            notes: "世界級暗空保護區，觀賞銀河與南十字星\n需提早 15 分鐘至遊客中心報到", 
+                            mapQuery: "Dark Sky Project Tekapo", 
+                            phrases: [
+                                { label: "觀星報到", text: "Hi, we booked the 9:30 PM stargazing tour under Wu." },
+                                { label: "防寒保暖詢問", text: "Is it cold up on the mountain? Should we wear heavy jackets?" }
+                            ],
+                            attachments: [
+                                { type: "link", name: "Dark Sky Project 觀星預約官網", url: "https://www.darkskyproject.co.nz/" }
+                            ],
+                            estCost: 180 
+                        }
                     ]
                 }
             ]
@@ -368,7 +375,7 @@
         let activeCategoryFilter = 'all';
 
         // LocalStorage Key
-        const STORAGE_KEY = 'NZ_TRAVEL_ITINERARY_CMS_DATA';
+        const STORAGE_KEY = 'NZ_TRAVEL_ITINERARY_CMS_DATA_V2';
 
         // Initialization
         window.onload = function() {
@@ -382,6 +389,17 @@
                 const saved = localStorage.getItem(STORAGE_KEY);
                 if (saved) {
                     itineraryData = JSON.parse(saved);
+                    // Migration check: ensure phrases and attachments arrays exist on all items
+                    itineraryData.days.forEach(day => {
+                        day.items.forEach(item => {
+                            if (!Array.isArray(item.phrases)) {
+                                item.phrases = item.englishPhrase ? [{ label: "通用情境", text: item.englishPhrase }] : [];
+                            }
+                            if (!Array.isArray(item.attachments)) {
+                                item.attachments = [];
+                            }
+                        });
+                    });
                 } else {
                     itineraryData = JSON.parse(JSON.stringify(DEFAULT_ITINERARY));
                 }
@@ -396,7 +414,7 @@
             try {
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(itineraryData));
             } catch (e) {
-                showToast("儲存失敗：空間可能已滿", true);
+                showToast("儲存失敗：附件檔案可能過大超出瀏覽器容量", true);
             }
         }
 
@@ -407,7 +425,7 @@
                 currentDayIndex = 0;
                 saveData();
                 renderApp();
-                showToast("已成功重置為預設 11 天行程！");
+                showToast("已成功重置為預設行程！");
             }
         }
 
@@ -544,13 +562,11 @@
                     // EDIT MODE CARD TEMPLATE
                     card.innerHTML = `
                         <div class="bg-amber-50/40 border-2 border-amber-300/80 rounded-2xl p-4 shadow-sm space-y-3 relative">
-                            <!-- Reorder & Action Header -->
+                            <!-- Header Bar -->
                             <div class="flex items-center justify-between border-b border-amber-200/60 pb-2">
-                                <div class="flex items-center gap-2">
-                                    <span class="text-xs font-black text-amber-800 bg-amber-200 px-2 py-0.5 rounded-md">
-                                        #${originalIndex + 1} 編輯中
-                                    </span>
-                                </div>
+                                <span class="text-xs font-black text-amber-800 bg-amber-200 px-2 py-0.5 rounded-md">
+                                    #${originalIndex + 1} 行程項目編輯
+                                </span>
                                 <div class="flex items-center gap-1">
                                     <button onclick="moveActivity(${originalIndex}, -1)" ${originalIndex === 0 ? 'disabled class="opacity-30 text-slate-400 p-1"' : 'class="p-1 hover:bg-amber-200 text-amber-800 rounded"'} title="上移">
                                         <i class="fa-solid fa-arrow-up"></i>
@@ -591,18 +607,48 @@
                             </div>
 
                             <div>
-                                <label class="block text-[11px] text-slate-500 font-bold mb-0.5">備註與說明 (Notes)</label>
-                                <textarea oninput="updateActivityField(${originalIndex}, 'notes', this.value)" class="w-full text-xs p-2 rounded-xl border border-slate-300 h-16">${escapeHtml(item.notes || '')}</textarea>
+                                <label class="block text-[11px] text-slate-500 font-bold mb-0.5">備註與說明 (支援換行)</label>
+                                <textarea oninput="updateActivityField(${originalIndex}, 'notes', this.value)" class="w-full text-xs p-2 rounded-xl border border-slate-300 h-20">${escapeHtml(item.notes || '')}</textarea>
                             </div>
 
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                <div>
-                                    <label class="block text-[11px] text-slate-500 font-bold mb-0.5">Google 地圖搜尋字串/名稱</label>
-                                    <input type="text" value="${escapeHtml(item.mapQuery || '')}" oninput="updateActivityField(${originalIndex}, 'mapQuery', this.value)" class="w-full text-xs p-2 rounded-xl border border-slate-300" placeholder="例如: Fairlie Bakehouse">
+                            <div>
+                                <label class="block text-[11px] text-slate-500 font-bold mb-0.5">Google 地圖搜尋名稱/地標</label>
+                                <input type="text" value="${escapeHtml(item.mapQuery || '')}" oninput="updateActivityField(${originalIndex}, 'mapQuery', this.value)" class="w-full text-xs p-2 rounded-xl border border-slate-300" placeholder="例如: Fairlie Bakehouse">
+                            </div>
+
+                            <!-- Multiple English Phrases Section (CMS) -->
+                            <div class="bg-indigo-50/60 p-3 rounded-xl border border-indigo-100 space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs font-bold text-indigo-800 flex items-center gap-1">
+                                        <i class="fa-solid fa-comment-dots"></i> 實用英文對話/情境例句 (多句)
+                                    </span>
+                                    <button onclick="addPhraseToActivity(${originalIndex})" class="text-[11px] font-bold bg-indigo-600 text-white px-2 py-0.5 rounded-lg hover:bg-indigo-700 transition-all">
+                                        + 新增例句
+                                    </button>
                                 </div>
-                                <div>
-                                    <label class="block text-[11px] text-slate-500 font-bold mb-0.5">實用英文對話例句 (English Prompt)</label>
-                                    <input type="text" value="${escapeHtml(item.englishPhrase || '')}" oninput="updateActivityField(${originalIndex}, 'englishPhrase', this.value)" class="w-full text-xs p-2 rounded-xl border border-slate-300" placeholder="例如: Could we get a table for two?">
+                                <div class="space-y-2" id="phrases-editor-${originalIndex}">
+                                    ${renderPhrasesEditor(originalIndex, item.phrases || [])}
+                                </div>
+                            </div>
+
+                            <!-- Attachments CMS Section (Links / File Upload) -->
+                            <div class="bg-slate-100/70 p-3 rounded-xl border border-slate-200 space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs font-bold text-slate-700 flex items-center gap-1">
+                                        <i class="fa-solid fa-paperclip"></i> 附件管理 (網址連結 / 電子票券 / 檔案)
+                                    </span>
+                                    <div class="flex gap-1">
+                                        <button onclick="addLinkAttachment(${originalIndex})" class="text-[11px] font-bold bg-slate-700 text-white px-2 py-0.5 rounded-lg hover:bg-slate-800 transition-all">
+                                            + 網址連結
+                                        </button>
+                                        <label class="text-[11px] font-bold bg-teal-600 text-white px-2 py-0.5 rounded-lg hover:bg-teal-700 transition-all cursor-pointer">
+                                            + 上傳檔案
+                                            <input type="file" class="hidden" onchange="uploadFileAttachment(${originalIndex}, event)">
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="space-y-1.5" id="attachments-editor-${originalIndex}">
+                                    ${renderAttachmentsEditor(originalIndex, item.attachments || [])}
                                 </div>
                             </div>
                         </div>
@@ -610,6 +656,8 @@
                 } else {
                     // VIEW MODE CARD TEMPLATE
                     const mapUrl = item.mapQuery ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.mapQuery)}` : '#';
+                    const phraseCount = (item.phrases || []).length;
+                    const attachmentCount = (item.attachments || []).length;
 
                     card.innerHTML = `
                         <!-- Left Timeline Node Line -->
@@ -638,20 +686,36 @@
                                 ${escapeHtml(item.title)}
                             </h3>
 
-                            <!-- Notes -->
-                            ${item.notes ? `<p class="text-xs text-slate-600 mb-3 bg-slate-50/80 p-2.5 rounded-xl border border-slate-100 leading-relaxed">${escapeHtml(item.notes)}</p>` : ''}
+                            <!-- Notes with preserve-newlines -->
+                            ${item.notes ? `<p class="text-xs text-slate-600 mb-3 bg-slate-50/80 p-2.5 rounded-xl border border-slate-100 leading-relaxed preserve-newlines">${escapeHtml(item.notes)}</p>` : ''}
+
+                            <!-- View Mode Attachments Chips Container -->
+                            ${attachmentCount > 0 ? `
+                                <div class="mb-3 space-y-1">
+                                    <div class="text-[11px] font-bold text-slate-400">📎 附件與相關連結:</div>
+                                    <div class="flex flex-wrap gap-2">
+                                        ${item.attachments.map(att => `
+                                            <a href="${att.url || att.data}" target="_blank" rel="noopener noreferrer" download="${att.type === 'file' ? att.name : ''}" class="inline-flex items-center gap-1.5 text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 py-1 rounded-xl border border-slate-200 transition-all font-medium">
+                                                <i class="fa-solid ${att.type === 'link' ? 'fa-link text-blue-500' : 'fa-file-pdf text-rose-500'}"></i>
+                                                <span class="truncate max-w-[180px]">${escapeHtml(att.name)}</span>
+                                                <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-slate-400"></i>
+                                            </a>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            ` : ''}
 
                             <!-- Action Buttons Row -->
-                            <div class="flex items-center gap-2 pt-1 border-t border-slate-100">
+                            <div class="flex items-center gap-2 pt-2 border-t border-slate-100 flex-wrap">
                                 ${item.mapQuery ? `
                                     <a href="${mapUrl}" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold transition-all flex items-center gap-1.5 border border-blue-200/60">
                                         <i class="fa-solid fa-map-location-dot text-blue-600"></i> 開地圖
                                     </a>
                                 ` : ''}
 
-                                ${item.englishPhrase ? `
-                                    <button onclick="openPhraseModal('${escapeHtml(item.title)}', '${escapeHtml(item.englishPhrase)}')" class="px-3 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold transition-all flex items-center gap-1.5 border border-indigo-200/60">
-                                        <i class="fa-solid fa-comment-dots text-indigo-600"></i> 英文：對話
+                                ${phraseCount > 0 ? `
+                                    <button onclick="openPhraseModalForActivity(${originalIndex})" class="px-3 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold transition-all flex items-center gap-1.5 border border-indigo-200/60">
+                                        <i class="fa-solid fa-comment-dots text-indigo-600"></i> 英文對話 (${phraseCount} 句)
                                     </button>
                                 ` : ''}
                             </div>
@@ -661,6 +725,207 @@
 
                 container.appendChild(card);
             });
+        }
+
+        // Helper: Render Phrases Editor in CMS
+        function renderPhrasesEditor(actIndex, phrases) {
+            if (!phrases || phrases.length === 0) {
+                return `<div class="text-[11px] text-indigo-400 italic">尚無對話例句，點擊「+ 新增例句」即可加入</div>`;
+            }
+
+            return phrases.map((p, pIdx) => `
+                <div class="bg-white p-2 rounded-lg border border-indigo-100 space-y-1">
+                    <div class="flex items-center justify-between gap-2">
+                        <input type="text" value="${escapeHtml(p.label || '')}" placeholder="情境/情節名稱 (如: 詢問保險)" oninput="updatePhraseField(${actIndex}, ${pIdx}, 'label', this.value)" class="text-xs p-1 rounded border border-slate-200 font-bold text-indigo-900 w-1/3">
+                        <button onclick="removePhraseFromActivity(${actIndex}, ${pIdx})" class="text-rose-500 hover:text-rose-700 text-xs p-1">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                    <textarea placeholder="英文例句內容..." oninput="updatePhraseField(${actIndex}, ${pIdx}, 'text', this.value)" class="w-full text-xs p-1.5 rounded border border-slate-200 h-12">${escapeHtml(p.text || '')}</textarea>
+                </div>
+            `).join('');
+        }
+
+        // Helper: Render Attachments Editor in CMS
+        function renderAttachmentsEditor(actIndex, attachments) {
+            if (!attachments || attachments.length === 0) {
+                return `<div class="text-[11px] text-slate-400 italic">尚無附件或連結，可上方新增網址或上傳檔案</div>`;
+            }
+
+            return attachments.map((att, attIdx) => `
+                <div class="flex items-center justify-between bg-white p-2 rounded-lg border border-slate-200 text-xs gap-2">
+                    <div class="flex items-center gap-2 flex-1 min-w-0">
+                        <i class="fa-solid ${att.type === 'link' ? 'fa-link text-blue-500' : 'fa-file-lines text-teal-500'}"></i>
+                        <input type="text" value="${escapeHtml(att.name || '')}" placeholder="附件/連結標題" oninput="updateAttachmentName(${actIndex}, ${attIdx}, this.value)" class="text-xs p-1 rounded border border-slate-200 font-bold flex-1">
+                        ${att.type === 'link' ? `
+                            <input type="text" value="${escapeHtml(att.url || '')}" placeholder="https://..." oninput="updateAttachmentUrl(${actIndex}, ${attIdx}, this.value)" class="text-xs p-1 rounded border border-slate-200 flex-1">
+                        ` : `<span class="text-[10px] text-slate-400">[檔案已就緒]</span>`}
+                    </div>
+                    <button onclick="removeAttachmentFromActivity(${actIndex}, ${attIdx})" class="text-rose-500 hover:text-rose-700 p-1">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        // Phrase CMS actions
+        function addPhraseToActivity(actIndex) {
+            const item = itineraryData.days[currentDayIndex].items[actIndex];
+            if (!item.phrases) item.phrases = [];
+            item.phrases.push({ label: "新對話情境", text: "How much does this cost?" });
+            saveData();
+            renderTimeline();
+        }
+
+        function updatePhraseField(actIndex, phraseIndex, field, value) {
+            const item = itineraryData.days[currentDayIndex].items[actIndex];
+            if (item && item.phrases && item.phrases[phraseIndex]) {
+                item.phrases[phraseIndex][field] = value;
+                saveData();
+            }
+        }
+
+        function removePhraseFromActivity(actIndex, phraseIndex) {
+            const item = itineraryData.days[currentDayIndex].items[actIndex];
+            if (item && item.phrases) {
+                item.phrases.splice(phraseIndex, 1);
+                saveData();
+                renderTimeline();
+            }
+        }
+
+        // Attachment CMS actions
+        function addLinkAttachment(actIndex) {
+            const item = itineraryData.days[currentDayIndex].items[actIndex];
+            if (!item.attachments) item.attachments = [];
+            item.attachments.push({ type: 'link', name: '預約確認連結/網頁', url: 'https://' });
+            saveData();
+            renderTimeline();
+        }
+
+        function uploadFileAttachment(actIndex, event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (file.size > 5 * 1024 * 1024) {
+                showToast("檔案建議小於 5MB 以確保儲存順暢", true);
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const item = itineraryData.days[currentDayIndex].items[actIndex];
+                if (!item.attachments) item.attachments = [];
+                item.attachments.push({
+                    type: 'file',
+                    name: file.name,
+                    data: e.target.result
+                });
+                saveData();
+                renderTimeline();
+                showToast("檔案已成功附加！");
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function updateAttachmentName(actIndex, attIndex, value) {
+            const item = itineraryData.days[currentDayIndex].items[actIndex];
+            if (item && item.attachments && item.attachments[attIndex]) {
+                item.attachments[attIndex].name = value;
+                saveData();
+            }
+        }
+
+        function updateAttachmentUrl(actIndex, attIndex, value) {
+            const item = itineraryData.days[currentDayIndex].items[actIndex];
+            if (item && item.attachments && item.attachments[attIndex]) {
+                item.attachments[attIndex].url = value;
+                saveData();
+            }
+        }
+
+        function removeAttachmentFromActivity(actIndex, attIndex) {
+            const item = itineraryData.days[currentDayIndex].items[actIndex];
+            if (item && item.attachments) {
+                item.attachments.splice(attIndex, 1);
+                saveData();
+                renderTimeline();
+            }
+        }
+
+        // Open Phrases Modal for Activity
+        function openPhraseModalForActivity(actIndex) {
+            const item = itineraryData.days[currentDayIndex].items[actIndex];
+            if (!item || !item.phrases || item.phrases.length === 0) return;
+
+            document.getElementById('phrase-modal-title').innerText = `${item.title} - 實用對話 (${item.phrases.length} 句)`;
+            const listContainer = document.getElementById('phrase-modal-list');
+            listContainer.innerHTML = '';
+
+            item.phrases.forEach((p, idx) => {
+                const card = document.createElement('div');
+                card.className = "bg-gradient-to-br from-indigo-50/70 to-blue-50/70 rounded-2xl p-4 border border-indigo-100 space-y-3";
+                card.innerHTML = `
+                    <div class="flex items-center justify-between border-b border-indigo-100/80 pb-2">
+                        <span class="text-xs font-bold text-indigo-700 bg-indigo-100/80 px-2.5 py-0.5 rounded-md">
+                            💡 ${escapeHtml(p.label || '對話情境')}
+                        </span>
+                        <span class="text-[11px] text-slate-400">#${idx + 1}</span>
+                    </div>
+                    <p class="text-lg sm:text-xl font-black text-slate-900 tracking-wide leading-relaxed select-all">
+                        "${escapeHtml(p.text)}"
+                    </p>
+                    <div class="flex items-center gap-2 pt-1">
+                        <button onclick="speakText('${escapeHtml(p.text)}')" class="flex-1 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-sm transition-all active:scale-95">
+                            <i class="fa-solid fa-volume-high"></i> 朗讀聲音
+                        </button>
+                        <button onclick="copyTextToClipboard('${escapeHtml(p.text)}')" class="flex-1 py-2 bg-white hover:bg-slate-50 text-slate-700 font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 border border-slate-200 transition-all active:scale-95">
+                            <i class="fa-solid fa-copy"></i> 複製文字
+                        </button>
+                    </div>
+                `;
+                listContainer.appendChild(card);
+            });
+
+            document.getElementById('phrase-modal').classList.remove('hidden');
+        }
+
+        function closePhraseModal() {
+            document.getElementById('phrase-modal').classList.add('hidden');
+        }
+
+        // TTS & Copy Helpers
+        function speakText(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-US';
+                utterance.rate = 0.85;
+                window.speechSynthesis.speak(utterance);
+                showToast("🔊 正在發音朗讀...");
+            } else {
+                showToast("您的瀏覽器不支援語音朗讀", true);
+            }
+        }
+
+        function copyTextToClipboard(text) {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showToast("已複製英文對話至剪貼簿！");
+                }).catch(() => fallbackCopy(text));
+            } else {
+                fallbackCopy(text);
+            }
+        }
+
+        function fallbackCopy(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            showToast("已複製英文對話至剪貼簿！");
         }
 
         // Toggle Edit Mode
@@ -725,9 +990,12 @@
                 time: "12:00",
                 category: "景點",
                 title: "新行程項目",
-                notes: "點擊此處輸入詳細說明或注意事項...",
+                notes: "點擊此處輸入詳細說明...",
                 mapQuery: "",
-                englishPhrase: "",
+                phrases: [
+                    { label: "詢問處", text: "Excuse me, where is the main entrance?" }
+                ],
+                attachments: [],
                 estCost: 0
             };
             currentDay.items.push(newItem);
@@ -784,7 +1052,8 @@
                         title: "展開精彩一日探險",
                         notes: "在此輸入今天的行程概要",
                         mapQuery: "New Zealand",
-                        englishPhrase: "Good morning!",
+                        phrases: [{ label: "問候", text: "Good morning!" }],
+                        attachments: [],
                         estCost: 0
                     }
                 ]
@@ -804,7 +1073,6 @@
             }
             if (confirm(`確定要刪除整個 Day ${itineraryData.days[currentDayIndex].dayNum} 嗎？`)) {
                 itineraryData.days.splice(currentDayIndex, 1);
-                // Re-index day numbers
                 itineraryData.days.forEach((day, i) => {
                     day.dayNum = i + 1;
                 });
@@ -856,55 +1124,6 @@
                 }
             };
             reader.readAsText(file);
-        }
-
-        // English Modal Controls
-        let currentModalPhrase = '';
-
-        function openPhraseModal(cnContext, phrase) {
-            currentModalPhrase = phrase;
-            document.getElementById('phrase-modal-cn').innerText = `💡 使用情境: ${cnContext}`;
-            document.getElementById('phrase-modal-en').innerText = `"${phrase}"`;
-            document.getElementById('phrase-modal').classList.remove('hidden');
-        }
-
-        function closePhraseModal() {
-            document.getElementById('phrase-modal').classList.add('hidden');
-        }
-
-        function speakPhrase() {
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel(); // Stop any ongoing speech
-                const utterance = new SpeechSynthesisUtterance(currentModalPhrase);
-                utterance.lang = 'en-US';
-                utterance.rate = 0.9; // Slightly slower for clarity
-                window.speechSynthesis.speak(utterance);
-                showToast("🔊 正在朗讀...");
-            } else {
-                showToast("您的瀏覽器不支援語音朗讀功能", true);
-            }
-        }
-
-        function copyPhraseText() {
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(currentModalPhrase).then(() => {
-                    showToast("已複製對話英文至剪貼簿！");
-                }).catch(() => {
-                    fallbackCopyText(currentModalPhrase);
-                });
-            } else {
-                fallbackCopyText(currentModalPhrase);
-            }
-        }
-
-        function fallbackCopyText(text) {
-            const textarea = document.createElement('textarea');
-            textarea.value = text;
-            document.body.appendChild(textarea);
-            textarea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textarea);
-            showToast("已複製對話英文至剪貼簿！");
         }
 
         // Toast Helper
