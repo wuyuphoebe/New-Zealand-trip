@@ -100,7 +100,7 @@
     </header>
 
     <!-- Main Content Container -->
-    <main class="max-w-4xl mx-auto px-4 mt-4 space-y-4">
+    <main id="itinerary-main" class="max-w-4xl mx-auto px-4 mt-4 space-y-4">
 
         <!-- Trip Overview Stats Box -->
         <section class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80">
@@ -179,6 +179,69 @@
             </button>
         </div>
 
+    </main>
+
+    <!-- Pre-trip Notes Page -->
+    <main id="pretrip-page" class="hidden max-w-4xl mx-auto px-4 mt-4 space-y-4 pb-8">
+        <section class="rounded-2xl bg-gradient-to-br from-emerald-700 to-teal-600 p-5 text-white shadow-md">
+            <div class="flex items-center gap-3 mb-2"><span class="text-3xl">🧳</span><div><p class="text-xs font-semibold tracking-wider text-emerald-100">NEW ZEALAND TRIP GUIDE</p><h2 class="text-xl font-black">行前注意事項</h2></div></div>
+            <p class="text-sm leading-6 text-emerald-50">出發前逐項確認，抵達後也可以隨時回來查看。入境、交通及景點規定可能變動，出發前請再核對官方最新資訊。</p>
+        </section>
+
+        <section class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80">
+            <h3 class="font-bold text-slate-800 flex items-center gap-2 mb-3"><i class="fa-solid fa-passport text-blue-600"></i> 出發前必備文件</h3>
+            <div class="space-y-3 text-sm">
+                <label class="flex items-start gap-3"><input type="checkbox" class="pretrip-check mt-1 accent-emerald-600"><span><b>護照</b><span class="block text-slate-500 mt-0.5">確認有效期限符合航空公司及紐西蘭入境要求，並備妥電子檔或影本。</span></span></label>
+                <label class="flex items-start gap-3"><input type="checkbox" class="pretrip-check mt-1 accent-emerald-600"><span><b>NZeTA／簽證與入境資格</b><span class="block text-slate-500 mt-0.5">依護照國籍及旅行目的確認是否需要 NZeTA 或簽證，並保存核准資訊。</span></span></label>
+                <label class="flex items-start gap-3"><input type="checkbox" class="pretrip-check mt-1 accent-emerald-600"><span><b>New Zealand Traveller Declaration（旅客入境申報）</b><span class="block text-slate-500 mt-0.5">依官方規定在適當時間內完成申報；食品、藥品、戶外裝備等如實申報。</span></span></label>
+                <label class="flex items-start gap-3"><input type="checkbox" class="pretrip-check mt-1 accent-emerald-600"><span><b>機票、住宿、租車及活動訂單</b><span class="block text-slate-500 mt-0.5">下載離線副本，確認姓名、日期、取車地點、保險與取消條款。</span></span></label>
+                <label class="flex items-start gap-3"><input type="checkbox" class="pretrip-check mt-1 accent-emerald-600"><span><b>旅遊保險與緊急聯絡資訊</b><span class="block text-slate-500 mt-0.5">確認醫療、意外、租車自負額等保障範圍，將保單及家人聯絡方式存離線。</span></span></label>
+            </div>
+        </section>
+
+        <section class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80">
+            <h3 class="font-bold text-slate-800 flex items-center gap-2 mb-3"><i class="fa-solid fa-car-side text-emerald-600"></i> 自駕與交通提醒</h3>
+            <ul class="space-y-2 text-sm leading-6 text-slate-600 list-disc pl-5">
+                <li><b class="text-slate-800">靠左行駛：</b>紐西蘭車輛靠道路左側行駛，圓環、路口及轉彎時特別留意。</li>
+                <li><b class="text-slate-800">駕照：</b>確認台灣駕照、有效英文譯本或國際駕照及租車公司要求；隨身攜帶原件。</li>
+                <li><b class="text-slate-800">預留車程：</b>山路、單線橋、碎石路及天候都可能延長時間；不要只依導航估時，避免疲勞駕駛。</li>
+                <li><b class="text-slate-800">出發前查路況：</b>查看 NZTA Waka Kotahi 官方路況、道路封閉及天氣警報；遇到冰雪或強風應調整行程。</li>
+                <li><b class="text-slate-800">租車檢查：</b>取車時拍攝車身、玻璃、輪胎及油量；確認燃油種類、還車時間、保險及道路救援方式。</li>
+                <li><b class="text-slate-800">停車與速度：</b>遵守限速、停車標誌及安全帶規定；開車時不要手持手機。</li>
+            </ul>
+        </section>
+
+        <section class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80">
+            <h3 class="font-bold text-slate-800 flex items-center gap-2 mb-3"><i class="fa-solid fa-suitcase-rolling text-amber-600"></i> 行李與生活用品</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                <div class="rounded-xl bg-slate-50 p-3"><p class="font-bold mb-2">衣物與戶外用品</p><ul class="list-disc pl-5 space-y-1 text-slate-600"><li>洋蔥式穿搭、防風防水外套</li><li>舒適防滑鞋、保暖層與襪子</li><li>太陽眼鏡、防曬乳、帽子</li><li>水壺、日用背包、雨具</li></ul></div>
+                <div class="rounded-xl bg-slate-50 p-3"><p class="font-bold mb-2">電子與日用品</p><ul class="list-disc pl-5 space-y-1 text-slate-600"><li>紐西蘭 Type I 插頭轉接器</li><li>手機、充電線、行動電源</li><li>SIM／eSIM 與離線地圖</li><li>個人常備藥及原包裝</li></ul></div>
+            </div>
+            <p class="mt-3 text-xs leading-5 text-amber-800 bg-amber-50 rounded-xl p-3">⚠️ 紐西蘭對食物、植物、動物製品及戶外裝備的生物安全規定嚴格。鞋底、露營或登山裝備請先清潔；不確定能否攜帶的物品，請查官方規定並如實申報。</p>
+        </section>
+
+        <section class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80">
+            <h3 class="font-bold text-slate-800 flex items-center gap-2 mb-3"><i class="fa-solid fa-wallet text-purple-600"></i> 金錢、網路與實用資訊</h3>
+            <ul class="space-y-2 text-sm leading-6 text-slate-600 list-disc pl-5">
+                <li>準備可海外刷卡的信用卡／金融卡，出發前確認海外交易與提款功能；少量紐幣現金可作備用。</li>
+                <li>下載離線 Google Maps、住宿地址、租車公司電話與訂單；確認手機漫遊或 eSIM 可用。</li>
+                <li>紐西蘭插座為 Type I，電壓約 230V；確認充電器標示支援 100–240V。</li>
+                <li>小費通常不是必須，但若服務特別好可自行決定；餐廳營業時間及偏遠地區商店時間可能較短。</li>
+                <li>緊急狀況請撥 <b class="text-slate-800">111</b>（警察、消防或救護）；非緊急警察事件可查詢 <b class="text-slate-800">105</b> 官方服務。</li>
+            </ul>
+        </section>
+
+        <section class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80">
+            <h3 class="font-bold text-slate-800 flex items-center gap-2 mb-3"><i class="fa-solid fa-link text-sky-600"></i> 出發前官方網站</h3>
+            <div class="space-y-2 text-sm">
+                <a class="flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-50 hover:bg-slate-100" href="https://www.immigration.govt.nz/" target="_blank" rel="noopener noreferrer"><span><b>紐西蘭移民局</b><span class="block text-slate-500 text-xs mt-0.5">簽證與 NZeTA 資訊</span></span><i class="fa-solid fa-arrow-up-right-from-square text-slate-400"></i></a>
+                <a class="flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-50 hover:bg-slate-100" href="https://www.travellerdeclaration.govt.nz/" target="_blank" rel="noopener noreferrer"><span><b>紐西蘭旅客入境申報</b><span class="block text-slate-500 text-xs mt-0.5">Traveller Declaration</span></span><i class="fa-solid fa-arrow-up-right-from-square text-slate-400"></i></a>
+                <a class="flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-50 hover:bg-slate-100" href="https://www.mpi.govt.nz/" target="_blank" rel="noopener noreferrer"><span><b>初級產業部 MPI</b><span class="block text-slate-500 text-xs mt-0.5">生物安全與可攜帶物品規定</span></span><i class="fa-solid fa-arrow-up-right-from-square text-slate-400"></i></a>
+                <a class="flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-50 hover:bg-slate-100" href="https://www.journeys.nzta.govt.nz/traffic/" target="_blank" rel="noopener noreferrer"><span><b>NZTA 即時路況</b><span class="block text-slate-500 text-xs mt-0.5">道路狀況與交通資訊</span></span><i class="fa-solid fa-arrow-up-right-from-square text-slate-400"></i></a>
+                <a class="flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-50 hover:bg-slate-100" href="https://www.metservice.com/" target="_blank" rel="noopener noreferrer"><span><b>MetService 天氣預報</b><span class="block text-slate-500 text-xs mt-0.5">出發前及自駕途中查看天氣</span></span><i class="fa-solid fa-arrow-up-right-from-square text-slate-400"></i></a>
+            </div>
+        </section>
+        <p class="text-xs text-slate-400 text-center px-3">行前清單目前只在本頁勾選，不會同步到其他裝置。官方規定可能更新，請以出發時的官方資訊為準。</p>
     </main>
 
     <!-- Floating Action Button for Quick Adding Activity in Edit Mode -->
@@ -373,6 +436,7 @@
         let currentDayIndex = 0;
         let isEditMode = false;
         let activeCategoryFilter = 'all';
+        let activePage = 'itinerary';
 
         // LocalStorage Key
         const STORAGE_KEY = 'NZ_TRAVEL_ITINERARY_CMS_DATA_V2';
@@ -435,12 +499,38 @@
             renderDayHeader();
             renderTimeline();
             updateModeUI();
+            updatePageView();
+        }
+
+        // Switch between itinerary and pre-trip notes
+        function switchPage(page) {
+            activePage = page;
+            updatePageView();
+            renderDayTabs();
+            if (page === 'itinerary') renderApp();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function updatePageView() {
+            const isItinerary = activePage === 'itinerary';
+            document.getElementById('itinerary-main').classList.toggle('hidden', !isItinerary);
+            document.getElementById('pretrip-page').classList.toggle('hidden', isItinerary);
+            document.getElementById('fab-add').classList.toggle('hidden', !(isItinerary && isEditMode));
         }
 
         // Render Top Day Selector Tabs
         function renderDayTabs() {
             const container = document.getElementById('day-tabs-container');
             container.innerHTML = '';
+
+            // 行前注意事項固定放在 Day 1 前面
+            const prepBtn = document.createElement('button');
+            prepBtn.onclick = () => switchPage('pretrip');
+            prepBtn.className = `px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 ${
+                activePage === 'pretrip' ? 'bg-amber-500 text-white shadow-md shadow-amber-500/30' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+            }`;
+            prepBtn.innerHTML = '<i class="fa-solid fa-clipboard-check"></i><span>行前注意事項</span>';
+            container.appendChild(prepBtn);
 
             itineraryData.days.forEach((day, index) => {
                 const isActive = index === currentDayIndex;
@@ -466,6 +556,7 @@
                 addDayBtn.innerHTML = `<i class="fa-solid fa-plus"></i> 加天數`;
                 container.appendChild(addDayBtn);
             }
+
         }
 
         // Render Day Stats and Info Overview
