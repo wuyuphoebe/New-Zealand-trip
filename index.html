@@ -533,11 +533,15 @@
             container.appendChild(prepBtn);
 
             itineraryData.days.forEach((day, index) => {
-                const isActive = index === currentDayIndex;
+                // 只有目前顯示行程頁時，才將目前天數標示為選取狀態
+                const isActive = activePage === 'itinerary' && index === currentDayIndex;
                 const btn = document.createElement('button');
                 btn.onclick = () => {
+                    // 點選任何 Day 分頁時，先切回行程頁，再重新渲染該天內容
+                    activePage = 'itinerary';
                     currentDayIndex = index;
                     renderApp();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
                 };
                 btn.className = `px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 ${
                     isActive 
