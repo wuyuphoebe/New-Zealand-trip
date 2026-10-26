@@ -29,8 +29,6 @@
         }
     </script>
     <style>
-        #pretrip-page .pretrip-editable { outline: 2px dashed #f59e0b; outline-offset: 3px; cursor: text; }
-        #pretrip-page [contenteditable="true"]:focus { outline: 2px solid #d97706; outline-offset: 3px; }
         body { font-family: 'Noto Sans TC', sans-serif; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
@@ -102,10 +100,10 @@
     </header>
 
     <!-- Main Content Container -->
-    <main id="itinerary-main" class="max-w-4xl mx-auto px-4 mt-4 space-y-4">
+    <main class="max-w-4xl mx-auto px-4 mt-4 space-y-4">
 
         <!-- Trip Overview Stats Box -->
-        <section class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80">
+        <section id="trip-overview" class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80">
             <div class="flex items-center justify-between mb-3 border-b border-slate-100 pb-2">
                 <div class="flex items-center gap-2">
                     <i class="fa-solid fa-chart-pie text-emerald-600"></i>
@@ -128,11 +126,11 @@
                 </div>
                 <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
                     <span class="text-slate-400 block text-[10px] mb-0.5">住宿地點</span>
-                    <span id="stat-lodging" class="font-black text-emerald-600 text-sm truncate block">未定</span>
+                    <span id="stat-lodging" class="font-black text-emerald-600 text-sm block whitespace-normal break-words leading-snug">未定</span>
                 </div>
                 <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
                     <span class="text-slate-400 block text-[10px] mb-0.5">預估車程/距離</span>
-                    <span id="stat-drive-time" class="font-black text-indigo-600 text-sm truncate block">約 -- km</span>
+                    <span id="stat-drive-time" class="font-black text-indigo-600 text-sm block whitespace-normal break-words leading-snug">約 -- km</span>
                 </div>
             </div>
 
@@ -181,79 +179,88 @@
             </button>
         </div>
 
-    </main>
-
-    <!-- Pre-trip Notes Page -->
-    <main id="pretrip-page" class="hidden max-w-4xl mx-auto px-4 mt-4 space-y-4 pb-8">
-        <div id="pretrip-edit-notice" class="hidden rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-            <i class="fa-solid fa-pen-to-square mr-1"></i><b>行前注意事項編輯模式：</b>可直接點選下方文字修改，修改內容會自動儲存在這台裝置的瀏覽器。編輯時請避免點擊官方網站連結。
-        </div>
-        <section class="rounded-2xl bg-gradient-to-br from-emerald-700 to-teal-600 p-5 text-white shadow-md">
-            <div class="flex items-center gap-3 mb-2"><span class="text-3xl">🧳</span><div><p class="text-xs font-semibold tracking-wider text-emerald-100">NEW ZEALAND TRIP GUIDE</p><h2 class="text-xl font-black">行前注意事項</h2></div></div>
-            <p class="text-sm leading-6 text-emerald-50">出發前逐項確認，抵達後也可以隨時回來查看。入境、交通及景點規定可能變動，出發前請再核對官方最新資訊。</p>
-        </section>
-
-        <section class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80">
-            <h3 class="font-bold text-slate-800 flex items-center gap-2 mb-3"><i class="fa-solid fa-passport text-blue-600"></i> 出發前必備文件</h3>
-            <div class="space-y-3 text-sm">
-                <label class="flex items-start gap-3"><input type="checkbox" class="pretrip-check mt-1 accent-emerald-600"><span><b>護照</b><span class="block text-slate-500 mt-0.5">確認有效期限符合航空公司及紐西蘭入境要求，並備妥電子檔或影本。</span></span></label>
-                <label class="flex items-start gap-3"><input type="checkbox" class="pretrip-check mt-1 accent-emerald-600"><span><b>NZeTA／簽證與入境資格</b><span class="block text-slate-500 mt-0.5">依護照國籍及旅行目的確認是否需要 NZeTA 或簽證，並保存核准資訊。</span></span></label>
-                <label class="flex items-start gap-3"><input type="checkbox" class="pretrip-check mt-1 accent-emerald-600"><span><b>New Zealand Traveller Declaration（旅客入境申報）</b><span class="block text-slate-500 mt-0.5">依官方規定在適當時間內完成申報；食品、藥品、戶外裝備等如實申報。</span></span></label>
-                <label class="flex items-start gap-3"><input type="checkbox" class="pretrip-check mt-1 accent-emerald-600"><span><b>機票、住宿、租車及活動訂單</b><span class="block text-slate-500 mt-0.5">下載離線副本，確認姓名、日期、取車地點、保險與取消條款。</span></span></label>
-                <label class="flex items-start gap-3"><input type="checkbox" class="pretrip-check mt-1 accent-emerald-600"><span><b>旅遊保險與緊急聯絡資訊</b><span class="block text-slate-500 mt-0.5">確認醫療、意外、租車自負額等保障範圍，將保單及家人聯絡方式存離線。</span></span></label>
+        <!-- Pre-trip Notes Page -->
+        <section id="pretrip-container" class="hidden max-w-4xl mx-auto mt-4 space-y-4 pb-8">
+            <div id="pretrip-edit-notice" class="hidden rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+                <i class="fa-solid fa-pen-to-square mr-1"></i><b>行前注意事項 CMS 編輯模式：</b>請像編輯 Day 行程一樣，在下方欄位修改文字；使用「新增清單項目」或「新增敘述」按鈕新增內容。修改會自動儲存在目前瀏覽器。
             </div>
-        </section>
-
-        <section class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80">
-            <h3 class="font-bold text-slate-800 flex items-center gap-2 mb-3"><i class="fa-solid fa-car-side text-emerald-600"></i> 自駕與交通提醒</h3>
-            <ul class="space-y-2 text-sm leading-6 text-slate-600 list-disc pl-5">
-                <li><b class="text-slate-800">靠左行駛：</b>紐西蘭車輛靠道路左側行駛，圓環、路口及轉彎時特別留意。</li>
-                <li><b class="text-slate-800">駕照：</b>確認台灣駕照、有效英文譯本或國際駕照及租車公司要求；隨身攜帶原件。</li>
-                <li><b class="text-slate-800">預留車程：</b>山路、單線橋、碎石路及天候都可能延長時間；不要只依導航估時，避免疲勞駕駛。</li>
-                <li><b class="text-slate-800">出發前查路況：</b>查看 NZTA Waka Kotahi 官方路況、道路封閉及天氣警報；遇到冰雪或強風應調整行程。</li>
-                <li><b class="text-slate-800">租車檢查：</b>取車時拍攝車身、玻璃、輪胎及油量；確認燃油種類、還車時間、保險及道路救援方式。</li>
-                <li><b class="text-slate-800">停車與速度：</b>遵守限速、停車標誌及安全帶規定；開車時不要手持手機。</li>
-            </ul>
-        </section>
-
-        <section class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80">
-            <h3 class="font-bold text-slate-800 flex items-center gap-2 mb-3"><i class="fa-solid fa-suitcase-rolling text-amber-600"></i> 行李與生活用品</h3>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-                <div class="rounded-xl bg-slate-50 p-3"><p class="font-bold mb-2">衣物與戶外用品</p><ul class="list-disc pl-5 space-y-1 text-slate-600"><li>洋蔥式穿搭、防風防水外套</li><li>舒適防滑鞋、保暖層與襪子</li><li>太陽眼鏡、防曬乳、帽子</li><li>水壺、日用背包、雨具</li></ul></div>
-                <div class="rounded-xl bg-slate-50 p-3"><p class="font-bold mb-2">電子與日用品</p><ul class="list-disc pl-5 space-y-1 text-slate-600"><li>紐西蘭 Type I 插頭轉接器</li><li>手機、充電線、行動電源</li><li>SIM／eSIM 與離線地圖</li><li>個人常備藥及原包裝</li></ul></div>
+            <div id="pretrip-cms-panel" class="hidden rounded-2xl border border-amber-200 bg-amber-50/70 p-4 space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-2"><div><h3 class="font-bold text-slate-800">行前事項編輯區</h3><p class="text-xs text-slate-500 mt-1">每個欄位會即時儲存；新增的項目也會保留。</p></div><button type="button" onclick="addPretripDescription()" class="px-3 py-2 rounded-xl bg-emerald-600 text-white text-xs font-bold">＋ 新增一般敘述</button></div>
+                <div id="pretrip-cms-fields" class="space-y-3"></div>
             </div>
-            <p class="mt-3 text-xs leading-5 text-amber-800 bg-amber-50 rounded-xl p-3">⚠️ 紐西蘭對食物、植物、動物製品及戶外裝備的生物安全規定嚴格。鞋底、露營或登山裝備請先清潔；不確定能否攜帶的物品，請查官方規定並如實申報。</p>
-        </section>
+            <section class="rounded-2xl bg-gradient-to-br from-emerald-700 to-teal-600 p-5 text-white shadow-md">
+                <div class="flex items-center gap-3 mb-2"><span class="text-3xl">🧳</span><div><p class="text-xs font-semibold tracking-wider text-emerald-100 pretrip-editable" data-pretrip-edit-id="eyebrow">NEW ZEALAND TRIP GUIDE</p><h2 class="text-xl font-black pretrip-editable" data-pretrip-edit-id="hero-title">行前注意事項</h2></div></div>
+                <p class="text-sm leading-6 text-emerald-50 pretrip-editable" data-pretrip-edit-id="hero-desc">出發前逐項確認，抵達後也可以隨時回來查看。入境、交通及景點規定可能變動，出發前請再核對官方最新資訊。</p>
+                <div class="h-2 bg-white/20 rounded-full overflow-hidden mt-4"><div id="pretrip-progress" class="h-full bg-white rounded-full transition-all" style="width:0%"></div></div>
+                <p id="pretrip-progress-text" class="text-xs text-emerald-50 mt-2">已完成 0 項</p>
+            </section>
 
-        <section class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80">
-            <h3 class="font-bold text-slate-800 flex items-center gap-2 mb-3"><i class="fa-solid fa-suitcase-rolling text-amber-600"></i> 紐西蘭入境可帶及不可帶的東西</h3>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-                <div class="rounded-xl bg-slate-50 p-3"><p class="font-bold mb-2">衣物與戶外用品</p><ul class="list-disc pl-5 space-y-1 text-slate-600"><li>洋蔥式穿搭、防風防水外套</li><li>舒適防滑鞋、保暖層與襪子</li><li>太陽眼鏡、防曬乳、帽子</li><li>水壺、日用背包、雨具</li></ul></div>
-                <div class="rounded-xl bg-slate-50 p-3"><p class="font-bold mb-2">電子與日用品</p><ul class="list-disc pl-5 space-y-1 text-slate-600"><li>紐西蘭 Type I 插頭轉接器</li><li>手機、充電線、行動電源</li><li>SIM／eSIM 與離線地圖</li><li>個人常備藥及原包裝</li></ul></div>
-            </div>
-            <p class="mt-3 text-xs leading-5 text-amber-800 bg-amber-50 rounded-xl p-3">⚠️ 紐西蘭對食物、植物、動物製品及戶外裝備的生物安全規定嚴格。鞋底、露營或登山裝備請先清潔；不確定能否攜帶的物品，請查官方規定並如實申報。</p>
-        </section>
-        
-        <section class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80">
-            <h3 class="font-bold text-slate-800 flex items-center gap-2 mb-3"><i class="fa-solid fa-suitcase-rolling text-amber-600"></i> 澳洲入境可帶及不可帶的東西</h3>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-                <div class="rounded-xl bg-slate-50 p-3"><p class="font-bold mb-2">衣物與戶外用品</p><ul class="list-disc pl-5 space-y-1 text-slate-600"><li>洋蔥式穿搭、防風防水外套</li><li>舒適防滑鞋、保暖層與襪子</li><li>太陽眼鏡、防曬乳、帽子</li><li>水壺、日用背包、雨具</li></ul></div>
-                <div class="rounded-xl bg-slate-50 p-3"><p class="font-bold mb-2">電子與日用品</p><ul class="list-disc pl-5 space-y-1 text-slate-600"><li>紐西蘭 Type I 插頭轉接器</li><li>手機、充電線、行動電源</li><li>SIM／eSIM 與離線地圖</li><li>個人常備藥及原包裝</li></ul></div>
-            </div>
-            <p class="mt-3 text-xs leading-5 text-amber-800 bg-amber-50 rounded-xl p-3">⚠️ 紐西蘭對食物、植物、動物製品及戶外裝備的生物安全規定嚴格。鞋底、露營或登山裝備請先清潔；不確定能否攜帶的物品，請查官方規定並如實申報。</p>
-        </section>
+            <section class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80">
+                <h3 class="font-bold text-slate-800 flex items-center gap-2 mb-3"><i class="fa-solid fa-passport text-blue-600"></i><span class="pretrip-editable" data-pretrip-edit-id="documents-title">出發前必備文件</span></h3>
+                <div class="space-y-3 text-sm">
+                    <label class="flex items-start gap-3"><input type="checkbox" class="pretrip-check mt-1 accent-emerald-600" data-check="passport"><span><b class="pretrip-editable" data-pretrip-edit-id="passport-title">護照</b><span class="block text-slate-500 mt-0.5 pretrip-editable" data-pretrip-edit-id="passport-desc">確認有效期限符合航空公司及紐西蘭入境要求，並備妥電子檔或影本。</span></span></label>
+                    <label class="flex items-start gap-3"><input type="checkbox" class="pretrip-check mt-1 accent-emerald-600" data-check="visa"><span><b class="pretrip-editable" data-pretrip-edit-id="visa-title">NZeTA／簽證與入境資格</b><span class="block text-slate-500 mt-0.5 pretrip-editable" data-pretrip-edit-id="visa-desc">依護照國籍及旅行目的確認是否需要 NZeTA 或簽證，並保存核准資訊。</span></span></label>
+                    <label class="flex items-start gap-3"><input type="checkbox" class="pretrip-check mt-1 accent-emerald-600" data-check="nztd"><span><b class="pretrip-editable" data-pretrip-edit-id="nztd-title">New Zealand Traveller Declaration（旅客入境申報）</b><span class="block text-slate-500 mt-0.5 pretrip-editable" data-pretrip-edit-id="nztd-desc">依官方規定在適當時間內完成申報；食品、藥品、戶外裝備等如實申報。</span></span></label>
+                    <label class="flex items-start gap-3"><input type="checkbox" class="pretrip-check mt-1 accent-emerald-600" data-check="bookings"><span><b class="pretrip-editable" data-pretrip-edit-id="bookings-title">機票、住宿、租車及活動訂單</b><span class="block text-slate-500 mt-0.5 pretrip-editable" data-pretrip-edit-id="bookings-desc">下載離線副本，確認姓名、日期、取車地點、保險與取消條款。</span></span></label>
+                    <label class="flex items-start gap-3"><input type="checkbox" class="pretrip-check mt-1 accent-emerald-600" data-check="insurance"><span><b class="pretrip-editable" data-pretrip-edit-id="insurance-title">旅遊保險與緊急聯絡資訊</b><span class="block text-slate-500 mt-0.5 pretrip-editable" data-pretrip-edit-id="insurance-desc">確認醫療、意外、租車自負額等保障範圍，將保單及家人聯絡方式存離線。</span></span></label>
+                    <label class="flex items-start gap-3"><input type="checkbox" class="pretrip-check mt-1 accent-emerald-600" data-check="license"><span><b class="pretrip-editable" data-pretrip-edit-id="license-title">駕照與租車文件</b><span class="block text-slate-500 mt-0.5 pretrip-editable" data-pretrip-edit-id="license-desc">確認台灣駕照、有效英文譯本或國際駕照及租車公司要求；隨身攜帶原件。</span></span></label>
+                </div>
+            </section>
 
-        <section class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80">
-            <h3 class="font-bold text-slate-800 flex items-center gap-2 mb-3"><i class="fa-solid fa-wallet text-purple-600"></i> 金錢、網路與實用資訊</h3>
-            <ul class="space-y-2 text-sm leading-6 text-slate-600 list-disc pl-5">
-                <li>準備可海外刷卡的信用卡／金融卡，出發前確認海外交易與提款功能；少量紐幣現金可作備用。</li>
-                <li>下載離線 Google Maps、住宿地址、租車公司電話與訂單；確認手機漫遊或 eSIM 可用。</li>
-                <li>紐西蘭插座為 Type I，電壓約 230V；確認充電器標示支援 100–240V。</li>
-                <li>小費通常不是必須，但若服務特別好可自行決定；餐廳營業時間及偏遠地區商店時間可能較短。</li>
-                <li>緊急狀況請撥 <b class="text-slate-800">111</b>（警察、消防或救護）；非緊急警察事件可查詢 <b class="text-slate-800">105</b> 官方服務。</li>
-            </ul>
+            <section class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80">
+                <h3 class="font-bold text-slate-800 flex items-center gap-2 mb-3"><i class="fa-solid fa-car-side text-emerald-600"></i><span class="pretrip-editable" data-pretrip-edit-id="driving-title">自駕與交通提醒</span></h3>
+                <ul class="space-y-2 text-sm leading-6 text-slate-600 list-disc pl-5">
+                    <li><b class="text-slate-800 pretrip-editable" data-pretrip-edit-id="left-title">靠左行駛：</b><span class="pretrip-editable" data-pretrip-edit-id="left-desc">紐西蘭車輛靠道路左側行駛，圓環、路口及轉彎時特別留意。</span></li>
+                    <li><b class="text-slate-800 pretrip-editable" data-pretrip-edit-id="license-rule-title">駕照：</b><span class="pretrip-editable" data-pretrip-edit-id="license-rule-desc">確認台灣駕照、有效英文譯本或國際駕照及租車公司要求；隨身攜帶原件。</span></li>
+                    <li><b class="text-slate-800 pretrip-editable" data-pretrip-edit-id="drive-time-title">預留車程：</b><span class="pretrip-editable" data-pretrip-edit-id="drive-time-desc">山路、單線橋、碎石路及天候都可能延長時間；不要只依導航估時，避免疲勞駕駛。</span></li>
+                    <li><b class="text-slate-800 pretrip-editable" data-pretrip-edit-id="road-title">出發前查路況：</b><span class="pretrip-editable" data-pretrip-edit-id="road-desc">查看 NZTA Waka Kotahi 官方路況、道路封閉及天氣警報；遇到冰雪或強風應調整行程。</span></li>
+                    <li><b class="text-slate-800 pretrip-editable" data-pretrip-edit-id="car-title">租車檢查：</b><span class="pretrip-editable" data-pretrip-edit-id="car-desc">取車時拍攝車身、玻璃、輪胎及油量；確認燃油種類、還車時間、保險及道路救援方式。</span></li>
+                    <li><b class="text-slate-800 pretrip-editable" data-pretrip-edit-id="parking-title">停車與速度：</b><span class="pretrip-editable" data-pretrip-edit-id="parking-desc">遵守限速、停車標誌及安全帶規定；開車時不要手持手機。</span></li>
+                </ul>
+            </section>
+
+            <section class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80">
+                <h3 class="font-bold text-slate-800 flex items-center gap-2 mb-3"><i class="fa-solid fa-suitcase-rolling text-amber-600"></i><span class="pretrip-editable" data-pretrip-edit-id="packing-title">行李與生活用品</span></h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                    <div class="rounded-xl bg-slate-50 p-3"><p class="font-bold mb-2 pretrip-editable" data-pretrip-edit-id="outdoor-title">衣物與戶外用品</p><ul class="list-disc pl-5 space-y-1 text-slate-600"><li class="pretrip-editable" data-pretrip-edit-id="outdoor-1">洋蔥式穿搭、防風防水外套</li><li class="pretrip-editable" data-pretrip-edit-id="outdoor-2">舒適防滑鞋、保暖層與襪子</li><li class="pretrip-editable" data-pretrip-edit-id="outdoor-3">太陽眼鏡、防曬乳、帽子</li><li class="pretrip-editable" data-pretrip-edit-id="outdoor-4">水壺、日用背包、雨具</li></ul></div>
+                    <div class="rounded-xl bg-slate-50 p-3"><p class="font-bold mb-2 pretrip-editable" data-pretrip-edit-id="electronics-title">電子與日用品</p><ul class="list-disc pl-5 space-y-1 text-slate-600"><li class="pretrip-editable" data-pretrip-edit-id="electronics-1">紐西蘭 Type I 插頭轉接器</li><li class="pretrip-editable" data-pretrip-edit-id="electronics-2">手機、充電線、行動電源</li><li class="pretrip-editable" data-pretrip-edit-id="electronics-3">SIM／eSIM 與離線地圖</li><li class="pretrip-editable" data-pretrip-edit-id="electronics-4">個人常備藥及原包裝</li></ul></div>
+                </div>
+                <p class="mt-3 text-xs leading-5 text-amber-800 bg-amber-50 rounded-xl p-3 pretrip-editable" data-pretrip-edit-id="biosecurity-warning">⚠️ 紐西蘭對食物、植物、動物製品及戶外裝備的生物安全規定嚴格。鞋底、露營或登山裝備請先清潔；不確定能否攜帶的物品，請查官方規定並如實申報。</p>
+            </section>
+
+            <section class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80">
+                <h3 class="font-bold text-slate-800 flex items-center gap-2 mb-3"><i class="fa-solid fa-leaf text-emerald-600"></i><span class="pretrip-editable" data-pretrip-edit-id="nz-entry-title">紐西蘭入境可帶及不可帶的東西</span></h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                    <div class="rounded-xl bg-emerald-50 p-3"><p class="font-bold mb-2 text-emerald-900 pretrip-editable" data-pretrip-edit-id="nz-declare-title">務必申報／先查規定</p><ul class="list-disc pl-5 space-y-1 text-slate-600"><li class="pretrip-editable" data-pretrip-edit-id="nz-declare-1">肉類、乳製品、蛋類、蜂蜜及其他食品</li><li class="pretrip-editable" data-pretrip-edit-id="nz-declare-2">水果、蔬菜、種子、植物及木製品</li><li class="pretrip-editable" data-pretrip-edit-id="nz-declare-3">動物製品、草藥及部分傳統藥材</li><li class="pretrip-editable" data-pretrip-edit-id="nz-declare-4">曾接觸土壤的鞋子、露營及戶外裝備</li></ul></div>
+                    <div class="rounded-xl bg-rose-50 p-3"><p class="font-bold mb-2 text-rose-900 pretrip-editable" data-pretrip-edit-id="nz-restrict-title">禁止或可能受限制</p><ul class="list-disc pl-5 space-y-1 text-slate-600"><li class="pretrip-editable" data-pretrip-edit-id="nz-restrict-1">未經許可的違禁食品、生物及植物材料</li><li class="pretrip-editable" data-pretrip-edit-id="nz-restrict-2">部分武器、受管制物品及特定藥品</li><li class="pretrip-editable" data-pretrip-edit-id="nz-restrict-3">超過免稅額的菸酒或其他應申報物品</li><li class="pretrip-editable" data-pretrip-edit-id="nz-restrict-4">不確定時請查官方規定並如實申報</li></ul></div>
+                </div>
+                <p class="mt-3 text-xs leading-5 text-amber-800 bg-amber-50 rounded-xl p-3 pretrip-editable" data-pretrip-edit-id="nz-entry-warning">入境規定會依物品種類與數量不同而異；不要只依旅遊文章判斷，請以紐西蘭官方生物安全及海關資訊為準。</p>
+            </section>
+
+            <section class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80">
+                <h3 class="font-bold text-slate-800 flex items-center gap-2 mb-3"><i class="fa-solid fa-plane-arrival text-blue-600"></i><span class="pretrip-editable" data-pretrip-edit-id="au-entry-title">澳洲入境可帶及不可帶的東西（若有轉機／入境）</span></h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                    <div class="rounded-xl bg-emerald-50 p-3"><p class="font-bold mb-2 text-emerald-900 pretrip-editable" data-pretrip-edit-id="au-declare-title">務必申報／先查規定</p><ul class="list-disc pl-5 space-y-1 text-slate-600"><li class="pretrip-editable" data-pretrip-edit-id="au-declare-1">食品、肉類、乳製品、蛋類及蜂蜜</li><li class="pretrip-editable" data-pretrip-edit-id="au-declare-2">植物、種子、木製品及動物製品</li><li class="pretrip-editable" data-pretrip-edit-id="au-declare-3">戶外鞋具、露營裝備及可能帶有泥土的物品</li><li class="pretrip-editable" data-pretrip-edit-id="au-declare-4">藥品、現金及其他需申報物品</li></ul></div>
+                    <div class="rounded-xl bg-rose-50 p-3"><p class="font-bold mb-2 text-rose-900 pretrip-editable" data-pretrip-edit-id="au-restrict-title">禁止或可能受限制</p><ul class="list-disc pl-5 space-y-1 text-slate-600"><li class="pretrip-editable" data-pretrip-edit-id="au-restrict-1">未經許可的生鮮食品、植物及動物產品</li><li class="pretrip-editable" data-pretrip-edit-id="au-restrict-2">部分藥品、武器及受管制物品</li><li class="pretrip-editable" data-pretrip-edit-id="au-restrict-3">超過申報門檻的現金或特定物品</li><li class="pretrip-editable" data-pretrip-edit-id="au-restrict-4">所有入境申報請依澳洲官方規定辦理</li></ul></div>
+                </div>
+                <p class="mt-3 text-xs leading-5 text-amber-800 bg-amber-50 rounded-xl p-3 pretrip-editable" data-pretrip-edit-id="au-entry-warning">若只是在澳洲機場轉機，也請確認是否需要通過入境檢查或重新託運行李；規定請以澳洲官方資訊及航空公司說明為準。</p>
+            </section>
+
+            <section class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80">
+                <h3 class="font-bold text-slate-800 flex items-center gap-2 mb-3"><i class="fa-solid fa-wallet text-purple-600"></i><span class="pretrip-editable" data-pretrip-edit-id="money-title">金錢、網路與實用資訊</span></h3>
+                <ul class="space-y-2 text-sm leading-6 text-slate-600 list-disc pl-5">
+                    <li class="pretrip-editable" data-pretrip-edit-id="money-1">準備可海外刷卡的信用卡／金融卡，出發前確認海外交易與提款功能；少量紐幣現金可作備用。</li>
+                    <li class="pretrip-editable" data-pretrip-edit-id="money-2">下載離線 Google Maps、住宿地址、租車公司電話與訂單；確認手機漫遊或 eSIM 可用。</li>
+                    <li class="pretrip-editable" data-pretrip-edit-id="money-3">紐西蘭插座為 Type I，電壓約 230V；確認充電器標示支援 100–240V。</li>
+                    <li class="pretrip-editable" data-pretrip-edit-id="money-4">小費通常不是必須，但若服務特別好可自行決定；餐廳營業時間及偏遠地區商店時間可能較短。</li>
+                    <li class="pretrip-editable" data-pretrip-edit-id="money-5">緊急狀況請撥 <b class="text-slate-800">111</b>（警察、消防或救護）；非緊急警察事件可查詢 <b class="text-slate-800">105</b> 官方服務。</li>
+                </ul>
+            </section>
+
+            
+            <div id="pretrip-custom-display" class="space-y-3"></div>
+            <div class="flex flex-wrap items-center justify-between gap-3"><p class="text-xs text-slate-400 px-1 pretrip-editable" data-pretrip-edit-id="footer-note">行前清單只會儲存在目前裝置的瀏覽器，不會同步到其他裝置。官方規定可能更新，請以出發時的官方資訊為準。</p><button onclick="resetPretripChecks()" class="shrink-0 px-3 py-2 text-xs font-bold rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-600"><i class="fa-solid fa-rotate-left mr-1"></i>清除所有勾選</button></div>
         </section>
-        <p class="text-xs text-slate-400 text-center px-3">行前清單目前只在本頁勾選，不會同步到其他裝置。官方規定可能更新，請以出發時的官方資訊為準。</p>
     </main>
 
     <!-- Floating Action Button for Quick Adding Activity in Edit Mode -->
@@ -446,87 +453,76 @@
         // App State
         let itineraryData = null;
         let currentDayIndex = 0;
-        let isEditMode = false;
+        // 只有網址帶有 ?edit=1 時才開啟編輯模式；一般分享網址維持唯讀。
+        const EDITOR_ACCESS = new URLSearchParams(window.location.search).get('edit') === '1';
+        let isEditMode = EDITOR_ACCESS;
         let activeCategoryFilter = 'all';
-        let activePage = 'itinerary';
+        let isPretripPage = true;
 
         // LocalStorage Key
         const STORAGE_KEY = 'NZ_TRAVEL_ITINERARY_CMS_DATA_V2';
-        const PRETRIP_STORAGE_KEY = 'NZ_TRAVEL_PRETRIP_CMS_HTML_V1';
 
         // Initialization
-        window.onload = function() {
-            loadData();
-            loadPretripContent();
+        window.onload = async function() {
+            await loadData();
             renderApp();
+
+            // 一般分享網址是唯讀；只有加上 ?edit=1 的網址才顯示 CMS 控制。
+            if (!EDITOR_ACCESS) {
+                const editButton = document.getElementById('btn-edit-mode');
+                const dataMenuButton = document.querySelector('button[onclick="toggleDataMenu()"]');
+                if (editButton) editButton.classList.add('hidden');
+                if (dataMenuButton) dataMenuButton.classList.add('hidden');
+                const menu = document.getElementById('data-menu');
+                if (menu) menu.classList.add('hidden');
+            }
         };
 
-        // 行前注意事項有獨立的 CMS 儲存區，不影響每日行程資料
-        function loadPretripContent() {
-            try {
-                const savedHtml = localStorage.getItem(PRETRIP_STORAGE_KEY);
-                if (savedHtml) {
-                    const page = document.getElementById('pretrip-page');
-                    const notice = document.getElementById('pretrip-edit-notice');
-                    const wrapper = document.createElement('div');
-                    wrapper.innerHTML = savedHtml;
-                    page.replaceChildren(notice, ...Array.from(wrapper.childNodes));
-                }
-            } catch (e) {
-                console.warn('無法載入已儲存的行前注意事項內容：', e);
-            }
-        }
-
-        function savePretripContent() {
-            try {
-                const page = document.getElementById('pretrip-page');
-                const notice = document.getElementById('pretrip-edit-notice');
-                const savedNodes = Array.from(page.children).filter(node => node !== notice);
-                localStorage.setItem(PRETRIP_STORAGE_KEY, savedNodes.map(node => node.outerHTML).join('\n'));
-                showToast('行前注意事項已自動儲存');
-            } catch (e) {
-                showToast('行前注意事項儲存失敗，可能是瀏覽器儲存空間不足', true);
-            }
-        }
-
-        function setupPretripCMS() {
-            const page = document.getElementById('pretrip-page');
-            const notice = document.getElementById('pretrip-edit-notice');
-            notice.classList.toggle('hidden', !isEditMode);
-            Array.from(page.children).forEach(node => {
-                if (node !== notice) {
-                    node.setAttribute('contenteditable', isEditMode ? 'true' : 'false');
-                    node.classList.toggle('pretrip-editable', isEditMode);
-                }
-            });
-            page.oninput = function(event) {
-                if (isEditMode && event.target.closest('[contenteditable="true"]')) savePretripContent();
-            };
-        }
-
-        // Load data from LocalStorage or default
-        function loadData() {
-            try {
-                const saved = localStorage.getItem(STORAGE_KEY);
-                if (saved) {
-                    itineraryData = JSON.parse(saved);
-                    // Migration check: ensure phrases and attachments arrays exist on all items
-                    itineraryData.days.forEach(day => {
-                        day.items.forEach(item => {
-                            if (!Array.isArray(item.phrases)) {
-                                item.phrases = item.englishPhrase ? [{ label: "通用情境", text: item.englishPhrase }] : [];
-                            }
-                            if (!Array.isArray(item.attachments)) {
-                                item.attachments = [];
-                            }
-                        });
+        // 資料載入規則：
+        // 編輯網址 (?edit=1)：優先載入這台電腦的 localStorage。
+        // 一般分享網址：載入 GitHub Pages 同目錄的 itinerary.json，讓手機/其他裝置看到已發布資料。
+        async function loadData() {
+            const normalizeData = (data) => {
+                if (!data || !Array.isArray(data.days)) throw new Error("行程 JSON 格式不正確");
+                data.days.forEach(day => {
+                    if (!Array.isArray(day.items)) day.items = [];
+                    day.items.forEach(item => {
+                        if (!Array.isArray(item.phrases)) {
+                            item.phrases = item.englishPhrase ? [{ label: "通用情境", text: item.englishPhrase }] : [];
+                        }
+                        if (!Array.isArray(item.attachments)) item.attachments = [];
                     });
-                } else {
-                    itineraryData = JSON.parse(JSON.stringify(DEFAULT_ITINERARY));
+                });
+                return data;
+            };
+
+            if (EDITOR_ACCESS) {
+                try {
+                    const saved = localStorage.getItem(STORAGE_KEY);
+                    if (saved) {
+                        itineraryData = normalizeData(JSON.parse(saved));
+                        return;
+                    }
+                } catch (e) {
+                    console.error("無法讀取本機編輯資料：", e);
+                }
+            }
+
+            try {
+                const response = await fetch('./itinerary.json?v=' + Date.now(), { cache: 'no-store' });
+                if (!response.ok) throw new Error('找不到 itinerary.json');
+                itineraryData = normalizeData(await response.json());
+
+                // 編輯模式第一次開啟時，將已發布資料複製到本機，之後編輯不會直接改動公開版本。
+                if (EDITOR_ACCESS && !localStorage.getItem(STORAGE_KEY)) {
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(itineraryData));
                 }
             } catch (e) {
-                console.error("Failed to parse stored itinerary data:", e);
+                console.warn("無法載入已發布的 itinerary.json，改用內建預設行程：", e);
                 itineraryData = JSON.parse(JSON.stringify(DEFAULT_ITINERARY));
+                if (EDITOR_ACCESS) {
+                    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(itineraryData)); } catch (_) {}
+                }
             }
         }
 
@@ -553,26 +549,26 @@
         // Main Render Loop
         function renderApp() {
             renderDayTabs();
-            renderDayHeader();
-            renderTimeline();
+            const overview = document.getElementById('trip-overview');
+            const pretrip = document.getElementById('pretrip-container');
+            const editControls = document.getElementById('edit-day-controls');
+            const timeline = document.getElementById('timeline-container');
+            const addBar = document.getElementById('add-item-bar');
+            if (isPretripPage) {
+                if (overview) overview.classList.add('hidden');
+                if (pretrip) pretrip.classList.remove('hidden');
+                if (editControls) editControls.classList.add('hidden');
+                if (timeline) timeline.classList.add('hidden');
+                if (addBar) addBar.classList.add('hidden');
+                renderPretripChecks();
+            } else {
+                if (overview) overview.classList.remove('hidden');
+                if (pretrip) pretrip.classList.add('hidden');
+                if (timeline) timeline.classList.remove('hidden');
+                renderDayHeader();
+                renderTimeline();
+            }
             updateModeUI();
-            updatePageView();
-        }
-
-        // Switch between itinerary and pre-trip notes
-        function switchPage(page) {
-            activePage = page;
-            updatePageView();
-            renderDayTabs();
-            if (page === 'itinerary') renderApp();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function updatePageView() {
-            const isItinerary = activePage === 'itinerary';
-            document.getElementById('itinerary-main').classList.toggle('hidden', !isItinerary);
-            document.getElementById('pretrip-page').classList.toggle('hidden', isItinerary);
-            document.getElementById('fab-add').classList.toggle('hidden', !(isItinerary && isEditMode));
         }
 
         // Render Top Day Selector Tabs
@@ -580,25 +576,26 @@
             const container = document.getElementById('day-tabs-container');
             container.innerHTML = '';
 
-            // 行前注意事項固定放在 Day 1 前面
-            const prepBtn = document.createElement('button');
-            prepBtn.onclick = () => switchPage('pretrip');
-            prepBtn.className = `px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 ${
-                activePage === 'pretrip' ? 'bg-amber-500 text-white shadow-md shadow-amber-500/30' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+            const pretripBtn = document.createElement('button');
+            pretripBtn.onclick = () => {
+                isPretripPage = true;
+                renderApp();
+            };
+            pretripBtn.className = `px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 ${
+                isPretripPage
+                    ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/30'
+                    : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
             }`;
-            prepBtn.innerHTML = '<i class="fa-solid fa-clipboard-check"></i><span>行前注意事項</span>';
-            container.appendChild(prepBtn);
+            pretripBtn.innerHTML = '<i class="fa-solid fa-clipboard-check"></i><span>行前注意事項</span>';
+            container.appendChild(pretripBtn);
 
             itineraryData.days.forEach((day, index) => {
-                // 只有目前顯示行程頁時，才將目前天數標示為選取狀態
-                const isActive = activePage === 'itinerary' && index === currentDayIndex;
+                const isActive = !isPretripPage && index === currentDayIndex;
                 const btn = document.createElement('button');
                 btn.onclick = () => {
-                    // 點選任何 Day 分頁時，先切回行程頁，再重新渲染該天內容
-                    activePage = 'itinerary';
+                    isPretripPage = false;
                     currentDayIndex = index;
                     renderApp();
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
                 };
                 btn.className = `px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 ${
                     isActive 
@@ -617,7 +614,226 @@
                 addDayBtn.innerHTML = `<i class="fa-solid fa-plus"></i> 加天數`;
                 container.appendChild(addDayBtn);
             }
+        }
 
+        // 行前注意事項勾選狀態儲存在目前瀏覽器，不會覆蓋每日行程 JSON。
+        const PRETRIP_CHECKS_KEY = 'NZ_TRAVEL_PRETRIP_CHECKS_V1';
+        function renderPretripChecks() {
+            let saved = {};
+            try { saved = JSON.parse(localStorage.getItem(PRETRIP_CHECKS_KEY) || '{}') || {}; } catch (_) {}
+            const checks = Array.from(document.querySelectorAll('#pretrip-container .pretrip-check'));
+            checks.forEach(input => {
+                input.checked = Boolean(saved[input.dataset.check]);
+                input.onchange = () => {
+                    saved[input.dataset.check] = input.checked;
+                    try { localStorage.setItem(PRETRIP_CHECKS_KEY, JSON.stringify(saved)); } catch (_) {}
+                    updatePretripProgress();
+                };
+            });
+            renderPretripTextEdits();
+            updatePretripProgress();
+        }
+
+        const PRETRIP_TEXT_KEY = 'NZ_TRAVEL_PRETRIP_TEXT_V1';
+        const PRETRIP_CUSTOM_ITEMS_KEY = 'NZ_TRAVEL_PRETRIP_CUSTOM_ITEMS_V1';
+        function getPretripSavedText() {
+            try { return JSON.parse(localStorage.getItem(PRETRIP_TEXT_KEY) || '{}') || {}; } catch (_) { return {}; }
+        }
+        function savePretripText(key, value) {
+            const saved = getPretripSavedText();
+            saved[key] = value;
+            try { localStorage.setItem(PRETRIP_TEXT_KEY, JSON.stringify(saved)); } catch (_) {}
+        }
+        function renderPretripTextEdits() {
+            const notice = document.getElementById('pretrip-edit-notice');
+            const panel = document.getElementById('pretrip-cms-panel');
+            const fields = document.getElementById('pretrip-cms-fields');
+            const editing = Boolean(isEditMode && isPretripPage);
+            if (notice) notice.classList.toggle('hidden', !editing);
+            if (panel) panel.classList.toggle('hidden', !editing);
+            if (!fields) return;
+
+            const savedText = getPretripSavedText();
+            // 還原新增的清單項目，並為每個清單建立穩定 ID。
+            document.querySelectorAll('#pretrip-container ul').forEach((ul, index) => {
+                if (!ul.dataset.pretripListId) {
+                    const first = ul.querySelector('[data-pretrip-edit-id]');
+                    ul.dataset.pretripListId = first ? first.dataset.pretripEditId.replace(/-[^-]+$/, '') : `list-${index}`;
+                }
+                try {
+                    const savedList = localStorage.getItem('NZ_TRAVEL_PRETRIP_LIST_' + ul.dataset.pretripListId);
+                    if (savedList) ul.innerHTML = savedList;
+                } catch (_) {}
+            });
+            document.querySelectorAll('#pretrip-container [data-pretrip-edit-id]').forEach(el => {
+                const key = el.dataset.pretripEditId;
+                if (Object.prototype.hasOwnProperty.call(savedText, key)) el.textContent = savedText[key];
+                el.contentEditable = 'false';
+                el.classList.remove('outline-dashed', 'outline-amber-300');
+            });
+            renderPretripCustomDisplay();
+            if (!editing) { fields.innerHTML = ''; return; }
+
+            fields.innerHTML = '';
+            const heading = document.createElement('p');
+            heading.className = 'text-xs text-slate-500';
+            heading.textContent = '每張卡片就是一個項目，操作方式與 Day 行程相同：直接編輯欄位，使用上移／下移調整順序，或刪除項目。';
+            fields.appendChild(heading);
+
+            const elements = Array.from(document.querySelectorAll('#pretrip-container [data-pretrip-edit-id]'));
+            elements.forEach((el, index) => {
+                const key = el.dataset.pretripEditId;
+                const wrapper = document.createElement('div');
+                wrapper.className = 'rounded-2xl border-2 border-amber-200 bg-white p-3 shadow-sm space-y-2';
+                const top = document.createElement('div');
+                top.className = 'flex items-center justify-between gap-2';
+                const label = document.createElement('span');
+                label.className = 'text-xs font-black text-amber-800 bg-amber-100 px-2 py-1 rounded-md';
+                label.textContent = `#${index + 1} 內容項目`;
+                const controls = document.createElement('div');
+                controls.className = 'flex items-center gap-1';
+                if (el.tagName === 'LI' && el.parentElement?.tagName === 'UL') {
+                    const siblings = Array.from(el.parentElement.children);
+                    const itemIndex = siblings.indexOf(el);
+                    const moveUp = document.createElement('button');
+                    moveUp.type = 'button'; moveUp.className = 'px-2 py-1 rounded-lg border text-xs'; moveUp.textContent = '↑'; moveUp.title = '上移';
+                    moveUp.disabled = itemIndex === 0;
+                    moveUp.onclick = () => movePretripTextItem(key, -1);
+                    const moveDown = document.createElement('button');
+                    moveDown.type = 'button'; moveDown.className = 'px-2 py-1 rounded-lg border text-xs'; moveDown.textContent = '↓'; moveDown.title = '下移';
+                    moveDown.disabled = itemIndex === siblings.length - 1;
+                    moveDown.onclick = () => movePretripTextItem(key, 1);
+                    controls.append(moveUp, moveDown);
+                }
+                top.append(label, controls);
+                const fieldLabel = document.createElement('label');
+                fieldLabel.className = 'block text-xs font-bold text-slate-600';
+                fieldLabel.textContent = el.tagName === 'H2' || el.tagName === 'H3' ? '標題' : (el.tagName === 'B' ? '項目名稱' : '內容文字');
+                const input = document.createElement('textarea');
+                input.className = 'w-full text-sm p-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-500 outline-none';
+                input.rows = el.textContent.length > 90 ? 3 : 2;
+                input.value = el.textContent;
+                input.oninput = () => { el.textContent = input.value; savePretripText(key, input.value); };
+                wrapper.append(top, fieldLabel, input);
+
+                if (el.tagName === 'LI' && el.parentElement?.tagName === 'UL') {
+                    const list = el.parentElement;
+                    const itemControls = document.createElement('div');
+                    itemControls.className = 'flex justify-end gap-2';
+                    const add = document.createElement('button');
+                    add.type = 'button'; add.className = 'px-3 py-1.5 rounded-lg border border-emerald-300 bg-emerald-50 text-emerald-700 text-xs font-bold';
+                    add.textContent = '＋ 新增同清單項目';
+                    add.onclick = () => addPretripListItem(list, el);
+                    const del = document.createElement('button');
+                    del.type = 'button'; del.className = 'px-3 py-1.5 rounded-lg border border-rose-200 bg-rose-50 text-rose-700 text-xs font-bold';
+                    del.textContent = '刪除此項';
+                    del.onclick = () => deletePretripListItem(list, el);
+                    itemControls.append(add, del); wrapper.appendChild(itemControls);
+                }
+                fields.appendChild(wrapper);
+            });
+            renderPretripCustomDescriptions();
+        }
+        function persistPretripList(list) {
+            const key = 'NZ_TRAVEL_PRETRIP_LIST_' + (list.dataset.pretripListId || 'custom-list');
+            try { localStorage.setItem(key, list.innerHTML); } catch (_) {}
+        }
+        function addPretripListItem(list, afterItem) {
+            const id = 'custom-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7);
+            const li = document.createElement('li');
+            li.className = afterItem.className || 'pretrip-editable';
+            li.dataset.pretripEditId = id;
+            li.textContent = '請輸入新項目';
+            afterItem.insertAdjacentElement('afterend', li);
+            const saved = getPretripSavedText(); saved[id] = li.textContent;
+            try { localStorage.setItem(PRETRIP_TEXT_KEY, JSON.stringify(saved)); } catch (_) {}
+            persistPretripList(list);
+            renderPretripTextEdits();
+            const inputs = document.querySelectorAll('#pretrip-cms-fields textarea');
+            const target = Array.from(inputs).find(input => input.value === '請輸入新項目');
+            if (target) { target.focus(); target.select(); }
+        }
+        function deletePretripListItem(list, li) {
+            if (!confirm('確定要刪除此清單項目嗎？')) return;
+            const id = li.dataset.pretripEditId;
+            li.remove();
+            const saved = getPretripSavedText(); delete saved[id];
+            try { localStorage.setItem(PRETRIP_TEXT_KEY, JSON.stringify(saved)); } catch (_) {}
+            persistPretripList(list);
+            renderPretripTextEdits();
+        }
+        function movePretripTextItem(key, direction) {
+            const elements = Array.from(document.querySelectorAll('#pretrip-container [data-pretrip-edit-id]'));
+            const index = elements.findIndex(el => el.dataset.pretripEditId === key);
+            const el = elements[index];
+            const target = elements[index + direction];
+            if (!el || !target || el.parentElement !== target.parentElement) {
+                showToast('只能在同一個區塊內調整項目順序', true);
+                return;
+            }
+            if (direction < 0) target.insertAdjacentElement('beforebegin', el);
+            else target.insertAdjacentElement('afterend', el);
+            if (el.parentElement.tagName === 'UL') persistPretripList(el.parentElement);
+            renderPretripTextEdits();
+        }
+        function addPretripDescription() {
+            let custom = [];
+            try { custom = JSON.parse(localStorage.getItem(PRETRIP_CUSTOM_ITEMS_KEY) || '[]') || []; } catch (_) {}
+            custom.push({ id: 'custom-desc-' + Date.now(), text: '請輸入一般敘述' });
+            try { localStorage.setItem(PRETRIP_CUSTOM_ITEMS_KEY, JSON.stringify(custom)); } catch (_) {}
+            renderPretripTextEdits();
+            const inputs = document.querySelectorAll('#pretrip-custom-descriptions textarea');
+            if (inputs.length) { inputs[inputs.length - 1].focus(); inputs[inputs.length - 1].select(); }
+        }
+        function renderPretripCustomDisplay() {
+            const display = document.getElementById('pretrip-custom-display');
+            if (!display) return;
+            let custom = [];
+            try { custom = JSON.parse(localStorage.getItem(PRETRIP_CUSTOM_ITEMS_KEY) || '[]') || []; } catch (_) {}
+            display.innerHTML = '';
+            custom.forEach(item => {
+                const card = document.createElement('section');
+                card.className = 'bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80';
+                const p = document.createElement('p'); p.className = 'text-sm leading-6 text-slate-700 whitespace-pre-wrap'; p.textContent = item.text;
+                card.appendChild(p); display.appendChild(card);
+            });
+        }
+        function renderPretripCustomDescriptions() {
+            const fields = document.getElementById('pretrip-cms-fields');
+            if (!fields || !(isEditMode && isPretripPage)) return;
+            let custom = [];
+            try { custom = JSON.parse(localStorage.getItem(PRETRIP_CUSTOM_ITEMS_KEY) || '[]') || []; } catch (_) {}
+            if (!custom.length) return;
+            const section = document.createElement('div');
+            section.className = 'rounded-2xl border-2 border-emerald-200 bg-emerald-50 p-3 space-y-3';
+            const heading = document.createElement('h4'); heading.className = 'font-bold text-sm text-emerald-800'; heading.textContent = '新增的一般敘述'; section.appendChild(heading);
+            custom.forEach((item, index) => {
+                const row = document.createElement('div'); row.className = 'rounded-xl bg-white border border-emerald-100 p-3 flex gap-2 items-start';
+                const main = document.createElement('div'); main.className = 'flex-1 min-w-0 space-y-1';
+                const label = document.createElement('label'); label.className = 'block text-xs font-bold text-slate-600'; label.textContent = `#${index + 1} 一般敘述`;
+                const area = document.createElement('textarea'); area.className = 'w-full text-sm p-2 rounded-xl border border-slate-300'; area.rows = 3; area.value = item.text;
+                area.oninput = () => { item.text = area.value; try { localStorage.setItem(PRETRIP_CUSTOM_ITEMS_KEY, JSON.stringify(custom)); } catch (_) {} renderPretripCustomDisplay(); };
+                main.append(label, area);
+                const del = document.createElement('button'); del.type = 'button'; del.className = 'px-3 py-2 rounded-lg bg-rose-50 text-rose-700 border border-rose-200 text-xs font-bold'; del.textContent = '刪除';
+                del.onclick = () => { if (!confirm('確定要刪除此敘述嗎？')) return; custom.splice(index, 1); try { localStorage.setItem(PRETRIP_CUSTOM_ITEMS_KEY, JSON.stringify(custom)); } catch (_) {} renderPretripTextEdits(); };
+                row.append(main, del); section.appendChild(row);
+            });
+            fields.appendChild(section);
+        }
+        function updatePretripProgress() {
+            const checks = Array.from(document.querySelectorAll('#pretrip-container .pretrip-check'));
+            const completed = checks.filter(input => input.checked).length;
+            const percent = checks.length ? Math.round(completed / checks.length * 100) : 0;
+            const bar = document.getElementById('pretrip-progress');
+            const label = document.getElementById('pretrip-progress-text');
+            if (bar) bar.style.width = percent + '%';
+            if (label) label.innerText = `已完成 ${completed} / ${checks.length} 項（${percent}%）`;
+        }
+        function resetPretripChecks() {
+            if (!confirm('確定要清除所有行前注意事項的勾選嗎？')) return;
+            try { localStorage.removeItem(PRETRIP_CHECKS_KEY); } catch (_) {}
+            renderPretripChecks();
+            showToast('已清除行前注意事項勾選');
         }
 
         // Render Day Stats and Info Overview
@@ -1082,6 +1298,10 @@
 
         // Toggle Edit Mode
         function setEditMode(enable) {
+            if (enable && !EDITOR_ACCESS) {
+                showToast("此網址為唯讀模式。請使用你的編輯網址。", true);
+                return;
+            }
             isEditMode = enable;
             saveData();
             renderApp();
@@ -1097,7 +1317,7 @@
             const addItemBar = document.getElementById('add-item-bar');
             const fab = document.getElementById('fab-add');
             const catFilters = document.getElementById('category-filter-container');
-            setupPretripCMS();
+            renderPretripTextEdits();
 
             if (isEditMode) {
                 btnView.className = 'px-2.5 py-1 text-xs font-medium rounded-lg transition-all text-slate-400 hover:text-white flex items-center gap-1';
@@ -1105,9 +1325,15 @@
                 subtitle.innerText = "編輯模式 (可即時修改)";
                 document.getElementById('current-mode-badge').className = "inline-block w-2 h-2 rounded-full bg-amber-400 animate-ping";
 
-                editControls.classList.remove('hidden');
-                addItemBar.classList.remove('hidden');
-                fab.classList.remove('hidden');
+                if (isPretripPage) {
+                    editControls.classList.add('hidden');
+                    addItemBar.classList.add('hidden');
+                    fab.classList.add('hidden');
+                } else {
+                    editControls.classList.remove('hidden');
+                    addItemBar.classList.remove('hidden');
+                    fab.classList.remove('hidden');
+                }
                 catFilters.classList.add('hidden');
             } else {
                 btnView.className = 'px-2.5 py-1 text-xs font-medium rounded-lg transition-all text-white bg-slate-700 shadow-sm flex items-center gap-1';
@@ -1242,16 +1468,21 @@
             menu.classList.toggle('hidden');
         }
 
-        // Export JSON File
+        // 匯出 JSON：固定命名 itinerary.json，方便直接上傳並取代 GitHub 上的發布資料。
         function exportJSON() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(itineraryData, null, 2));
+            const blob = new Blob(
+                [JSON.stringify(itineraryData, null, 2)],
+                { type: "application/json;charset=utf-8" }
+            );
+            const url = URL.createObjectURL(blob);
             const dlAnchor = document.createElement('a');
-            dlAnchor.setAttribute("href", dataStr);
-            dlAnchor.setAttribute("download", `NewZealand_Itinerary_${new Date().toISOString().slice(0,10)}.json`);
+            dlAnchor.href = url;
+            dlAnchor.download = "itinerary.json";
             document.body.appendChild(dlAnchor);
             dlAnchor.click();
             dlAnchor.remove();
-            showToast("已成功匯出 JSON 備份檔！");
+            URL.revokeObjectURL(url);
+            showToast("已匯出 itinerary.json；上傳到 GitHub 取代舊檔後，手機就能看到新內容。");
         }
 
         // Import JSON File
