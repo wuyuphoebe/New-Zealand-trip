@@ -29,6 +29,8 @@
         }
     </script>
     <style>
+        #pretrip-page .pretrip-editable { outline: 2px dashed #f59e0b; outline-offset: 3px; cursor: text; }
+        #pretrip-page [contenteditable="true"]:focus { outline: 2px solid #d97706; outline-offset: 3px; }
         body { font-family: 'Noto Sans TC', sans-serif; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
@@ -183,6 +185,9 @@
 
     <!-- Pre-trip Notes Page -->
     <main id="pretrip-page" class="hidden max-w-4xl mx-auto px-4 mt-4 space-y-4 pb-8">
+        <div id="pretrip-edit-notice" class="hidden rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+            <i class="fa-solid fa-pen-to-square mr-1"></i><b>行前注意事項編輯模式：</b>可直接點選下方文字修改，修改內容會自動儲存在這台裝置的瀏覽器。編輯時請避免點擊官方網站連結。
+        </div>
         <section class="rounded-2xl bg-gradient-to-br from-emerald-700 to-teal-600 p-5 text-white shadow-md">
             <div class="flex items-center gap-3 mb-2"><span class="text-3xl">🧳</span><div><p class="text-xs font-semibold tracking-wider text-emerald-100">NEW ZEALAND TRIP GUIDE</p><h2 class="text-xl font-black">行前注意事項</h2></div></div>
             <p class="text-sm leading-6 text-emerald-50">出發前逐項確認，抵達後也可以隨時回來查看。入境、交通及景點規定可能變動，出發前請再核對官方最新資訊。</p>
@@ -229,17 +234,6 @@
                 <li>小費通常不是必須，但若服務特別好可自行決定；餐廳營業時間及偏遠地區商店時間可能較短。</li>
                 <li>緊急狀況請撥 <b class="text-slate-800">111</b>（警察、消防或救護）；非緊急警察事件可查詢 <b class="text-slate-800">105</b> 官方服務。</li>
             </ul>
-        </section>
-
-        <section class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80">
-            <h3 class="font-bold text-slate-800 flex items-center gap-2 mb-3"><i class="fa-solid fa-link text-sky-600"></i> 出發前官方網站</h3>
-            <div class="space-y-2 text-sm">
-                <a class="flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-50 hover:bg-slate-100" href="https://www.immigration.govt.nz/" target="_blank" rel="noopener noreferrer"><span><b>紐西蘭移民局</b><span class="block text-slate-500 text-xs mt-0.5">簽證與 NZeTA 資訊</span></span><i class="fa-solid fa-arrow-up-right-from-square text-slate-400"></i></a>
-                <a class="flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-50 hover:bg-slate-100" href="https://www.travellerdeclaration.govt.nz/" target="_blank" rel="noopener noreferrer"><span><b>紐西蘭旅客入境申報</b><span class="block text-slate-500 text-xs mt-0.5">Traveller Declaration</span></span><i class="fa-solid fa-arrow-up-right-from-square text-slate-400"></i></a>
-                <a class="flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-50 hover:bg-slate-100" href="https://www.mpi.govt.nz/" target="_blank" rel="noopener noreferrer"><span><b>初級產業部 MPI</b><span class="block text-slate-500 text-xs mt-0.5">生物安全與可攜帶物品規定</span></span><i class="fa-solid fa-arrow-up-right-from-square text-slate-400"></i></a>
-                <a class="flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-50 hover:bg-slate-100" href="https://www.journeys.nzta.govt.nz/traffic/" target="_blank" rel="noopener noreferrer"><span><b>NZTA 即時路況</b><span class="block text-slate-500 text-xs mt-0.5">道路狀況與交通資訊</span></span><i class="fa-solid fa-arrow-up-right-from-square text-slate-400"></i></a>
-                <a class="flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-50 hover:bg-slate-100" href="https://www.metservice.com/" target="_blank" rel="noopener noreferrer"><span><b>MetService 天氣預報</b><span class="block text-slate-500 text-xs mt-0.5">出發前及自駕途中查看天氣</span></span><i class="fa-solid fa-arrow-up-right-from-square text-slate-400"></i></a>
-            </div>
         </section>
         <p class="text-xs text-slate-400 text-center px-3">行前清單目前只在本頁勾選，不會同步到其他裝置。官方規定可能更新，請以出發時的官方資訊為準。</p>
     </main>
@@ -440,12 +434,57 @@
 
         // LocalStorage Key
         const STORAGE_KEY = 'NZ_TRAVEL_ITINERARY_CMS_DATA_V2';
+        const PRETRIP_STORAGE_KEY = 'NZ_TRAVEL_PRETRIP_CMS_HTML_V1';
 
         // Initialization
         window.onload = function() {
             loadData();
+            loadPretripContent();
             renderApp();
         };
+
+        // 行前注意事項有獨立的 CMS 儲存區，不影響每日行程資料
+        function loadPretripContent() {
+            try {
+                const savedHtml = localStorage.getItem(PRETRIP_STORAGE_KEY);
+                if (savedHtml) {
+                    const page = document.getElementById('pretrip-page');
+                    const notice = document.getElementById('pretrip-edit-notice');
+                    const wrapper = document.createElement('div');
+                    wrapper.innerHTML = savedHtml;
+                    page.replaceChildren(notice, ...Array.from(wrapper.childNodes));
+                }
+            } catch (e) {
+                console.warn('無法載入已儲存的行前注意事項內容：', e);
+            }
+        }
+
+        function savePretripContent() {
+            try {
+                const page = document.getElementById('pretrip-page');
+                const notice = document.getElementById('pretrip-edit-notice');
+                const savedNodes = Array.from(page.children).filter(node => node !== notice);
+                localStorage.setItem(PRETRIP_STORAGE_KEY, savedNodes.map(node => node.outerHTML).join('\n'));
+                showToast('行前注意事項已自動儲存');
+            } catch (e) {
+                showToast('行前注意事項儲存失敗，可能是瀏覽器儲存空間不足', true);
+            }
+        }
+
+        function setupPretripCMS() {
+            const page = document.getElementById('pretrip-page');
+            const notice = document.getElementById('pretrip-edit-notice');
+            notice.classList.toggle('hidden', !isEditMode);
+            Array.from(page.children).forEach(node => {
+                if (node !== notice) {
+                    node.setAttribute('contenteditable', isEditMode ? 'true' : 'false');
+                    node.classList.toggle('pretrip-editable', isEditMode);
+                }
+            });
+            page.oninput = function(event) {
+                if (isEditMode && event.target.closest('[contenteditable="true"]')) savePretripContent();
+            };
+        }
 
         // Load data from LocalStorage or default
         function loadData() {
@@ -1040,6 +1079,7 @@
             const addItemBar = document.getElementById('add-item-bar');
             const fab = document.getElementById('fab-add');
             const catFilters = document.getElementById('category-filter-container');
+            setupPretripCMS();
 
             if (isEditMode) {
                 btnView.className = 'px-2.5 py-1 text-xs font-medium rounded-lg transition-all text-slate-400 hover:text-white flex items-center gap-1';
