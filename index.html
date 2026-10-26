@@ -182,7 +182,7 @@
         <!-- Pre-trip Notes Page -->
         <section id="pretrip-container" class="hidden max-w-4xl mx-auto mt-4 space-y-4 pb-8">
             <div id="pretrip-edit-notice" class="hidden rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-                <i class="fa-solid fa-pen-to-square mr-1"></i><b>行前注意事項 CMS 編輯模式：</b>請像編輯 Day 行程一樣，在下方欄位修改文字；使用「新增清單項目」或「新增敘述」按鈕新增內容。修改會自動儲存在目前瀏覽器。
+                <i class="fa-solid fa-pen-to-square mr-1"></i><b>行前注意事項 CMS 編輯模式：</b>依照分類區塊編輯內容；每個區塊內的新增／刪除按鈕只影響該區塊。修改會自動儲存在目前瀏覽器。
             </div>
             <div id="pretrip-cms-panel" class="hidden rounded-2xl border border-amber-200 bg-amber-50/70 p-4 space-y-4">
                 <div class="flex flex-wrap items-center justify-between gap-2"><div><h3 class="font-bold text-slate-800">行前事項編輯區</h3><p class="text-xs text-slate-500 mt-1">每個欄位會即時儲存；新增的項目也會保留。</p></div><button type="button" onclick="addPretripDescription()" class="px-3 py-2 rounded-xl bg-emerald-600 text-white text-xs font-bold">＋ 新增一般敘述</button></div>
@@ -654,7 +654,7 @@
             if (!fields) return;
 
             const savedText = getPretripSavedText();
-            // 還原新增的清單項目，並為每個清單建立穩定 ID。
+            // 還原各清單新增的項目，並建立穩定的清單 ID。
             document.querySelectorAll('#pretrip-container ul').forEach((ul, index) => {
                 if (!ul.dataset.pretripListId) {
                     const first = ul.querySelector('[data-pretrip-edit-id]');
@@ -675,64 +675,119 @@
             if (!editing) { fields.innerHTML = ''; return; }
 
             fields.innerHTML = '';
-            const heading = document.createElement('p');
-            heading.className = 'text-xs text-slate-500';
-            heading.textContent = '每張卡片就是一個項目，操作方式與 Day 行程相同：直接編輯欄位，使用上移／下移調整順序，或刪除項目。';
-            fields.appendChild(heading);
+            const intro = document.createElement('p');
+            intro.className = 'text-xs text-slate-600';
+            intro.textContent = '已依照頁面分類分區編輯。每個區塊的新增／刪除按鈕只會作用於該區塊；文字修改會即時儲存。';
+            fields.appendChild(intro);
 
-            const elements = Array.from(document.querySelectorAll('#pretrip-container [data-pretrip-edit-id]'));
-            elements.forEach((el, index) => {
-                const key = el.dataset.pretripEditId;
-                const wrapper = document.createElement('div');
-                wrapper.className = 'rounded-2xl border-2 border-amber-200 bg-white p-3 shadow-sm space-y-2';
-                const top = document.createElement('div');
-                top.className = 'flex items-center justify-between gap-2';
-                const label = document.createElement('span');
-                label.className = 'text-xs font-black text-amber-800 bg-amber-100 px-2 py-1 rounded-md';
-                label.textContent = `#${index + 1} 內容項目`;
-                const controls = document.createElement('div');
-                controls.className = 'flex items-center gap-1';
-                if (el.tagName === 'LI' && el.parentElement?.tagName === 'UL') {
-                    const siblings = Array.from(el.parentElement.children);
-                    const itemIndex = siblings.indexOf(el);
-                    const moveUp = document.createElement('button');
-                    moveUp.type = 'button'; moveUp.className = 'px-2 py-1 rounded-lg border text-xs'; moveUp.textContent = '↑'; moveUp.title = '上移';
-                    moveUp.disabled = itemIndex === 0;
-                    moveUp.onclick = () => movePretripTextItem(key, -1);
-                    const moveDown = document.createElement('button');
-                    moveDown.type = 'button'; moveDown.className = 'px-2 py-1 rounded-lg border text-xs'; moveDown.textContent = '↓'; moveDown.title = '下移';
-                    moveDown.disabled = itemIndex === siblings.length - 1;
-                    moveDown.onclick = () => movePretripTextItem(key, 1);
-                    controls.append(moveUp, moveDown);
-                }
-                top.append(label, controls);
-                const fieldLabel = document.createElement('label');
-                fieldLabel.className = 'block text-xs font-bold text-slate-600';
-                fieldLabel.textContent = el.tagName === 'H2' || el.tagName === 'H3' ? '標題' : (el.tagName === 'B' ? '項目名稱' : '內容文字');
-                const input = document.createElement('textarea');
-                input.className = 'w-full text-sm p-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-500 outline-none';
-                input.rows = el.textContent.length > 90 ? 3 : 2;
-                input.value = el.textContent;
-                input.oninput = () => { el.textContent = input.value; savePretripText(key, input.value); };
-                wrapper.append(top, fieldLabel, input);
+            const root = document.getElementById('pretrip-container');
+            const topSections = Array.from(root.children).filter(el => el.tagName === 'SECTION' && !el.id);
+            const groups = topSections.map((section, idx) => {
+                const titleEl = section.querySelector('h3 [data-pretrip-edit-id], h2[data-pretrip-edit-id], h3[data-pretrip-edit-id]');
+                const title = titleEl ? titleEl.textContent.trim() : (section.querySelector('h2')?.textContent.trim() || `區塊 ${idx + 1}`);
+                const elements = Array.from(section.querySelectorAll('[data-pretrip-edit-id]'));
+                return { section, title, elements };
+            }).filter(group => group.elements.length);
 
-                if (el.tagName === 'LI' && el.parentElement?.tagName === 'UL') {
-                    const list = el.parentElement;
-                    const itemControls = document.createElement('div');
-                    itemControls.className = 'flex justify-end gap-2';
-                    const add = document.createElement('button');
-                    add.type = 'button'; add.className = 'px-3 py-1.5 rounded-lg border border-emerald-300 bg-emerald-50 text-emerald-700 text-xs font-bold';
-                    add.textContent = '＋ 新增同清單項目';
-                    add.onclick = () => addPretripListItem(list, el);
-                    const del = document.createElement('button');
-                    del.type = 'button'; del.className = 'px-3 py-1.5 rounded-lg border border-rose-200 bg-rose-50 text-rose-700 text-xs font-bold';
-                    del.textContent = '刪除此項';
-                    del.onclick = () => deletePretripListItem(list, el);
-                    itemControls.append(add, del); wrapper.appendChild(itemControls);
-                }
-                fields.appendChild(wrapper);
+            groups.forEach((group, groupIndex) => {
+                const card = document.createElement('section');
+                card.className = 'rounded-2xl border-2 border-slate-200 bg-white p-3 sm:p-4 space-y-3';
+                const header = document.createElement('div');
+                header.className = 'flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3';
+                const heading = document.createElement('h4');
+                heading.className = 'font-black text-sm text-slate-800';
+                heading.textContent = `${groupIndex + 1}. ${group.title}`;
+                const addBlock = document.createElement('button');
+                addBlock.type = 'button';
+                addBlock.className = 'px-3 py-2 rounded-xl bg-emerald-600 text-white text-xs font-bold';
+                addBlock.textContent = '＋ 在此區塊新增項目';
+                addBlock.onclick = () => addPretripBlockItem(group.section);
+                header.append(heading, addBlock);
+                card.appendChild(header);
+
+                group.elements.forEach((el, index) => {
+                    const key = el.dataset.pretripEditId;
+                    const row = document.createElement('div');
+                    row.className = 'rounded-xl border border-slate-200 bg-slate-50 p-3 space-y-2';
+                    const label = document.createElement('label');
+                    label.className = 'block text-xs font-bold text-slate-600';
+                    label.textContent = `${index + 1}. ` + (el.tagName === 'H2' || el.tagName === 'H3' || /-title$/.test(key) ? '標題／項目名稱' : '內容文字');
+                    const input = document.createElement('textarea');
+                    input.className = 'w-full text-sm p-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-500 outline-none bg-white';
+                    input.rows = el.textContent.length > 90 ? 3 : 2;
+                    input.value = el.textContent;
+                    input.oninput = () => {
+                        el.textContent = input.value;
+                        savePretripText(key, input.value);
+                        // 清單項目以 HTML 保存時也同步更新，避免重新整理後還原舊文字。
+                        if (el.parentElement?.tagName === 'LI' && el.closest('ul')) persistPretripList(el.closest('ul'));
+                    };
+                    row.append(label, input);
+
+                    // 將刪除控制放在「實際項目」上，而不只檢查編輯元素本身是不是 LI。
+                    // 例如自駕清單的 LI 裡面是標題與說明兩個編輯欄位；文件區則是 checkbox label。
+                    const itemLi = el.tagName === 'LI' ? el : el.closest('li');
+                    const itemLabel = el.closest('label');
+                    const logicalItem = itemLi || (itemLabel && itemLabel.querySelector('.pretrip-check') ? itemLabel : null);
+                    const firstEditorInItem = logicalItem && (logicalItem.matches('[data-pretrip-edit-id]') ? logicalItem : logicalItem.querySelector('[data-pretrip-edit-id]'));
+                    const isFirstEditorInItem = logicalItem && firstEditorInItem === el;
+                    if (logicalItem && isFirstEditorInItem) {
+                        const actions = document.createElement('div');
+                        actions.className = 'flex flex-wrap justify-end gap-2';
+                        if (itemLi && itemLi.parentElement?.tagName === 'UL') {
+                            const list = itemLi.parentElement;
+                            const add = document.createElement('button');
+                            add.type = 'button'; add.className = 'px-3 py-1.5 rounded-lg border border-emerald-300 bg-emerald-50 text-emerald-700 text-xs font-bold';
+                            add.textContent = '＋ 在此清單新增';
+                            add.onclick = () => addPretripListItem(list, itemLi);
+                            actions.appendChild(add);
+                        }
+                        const del = document.createElement('button');
+                        del.type = 'button'; del.className = 'px-3 py-1.5 rounded-lg border border-rose-200 bg-rose-50 text-rose-700 text-xs font-bold';
+                        del.textContent = '刪除此項';
+                        del.onclick = () => deletePretripLogicalItem(logicalItem);
+                        actions.appendChild(del);
+                        row.appendChild(actions);
+                    } else if (!logicalItem && (el.matches('h2, h3, p') || /-title$/.test(key))) {
+                        // 區塊標題、提醒文字等非清單項目也提供刪除控制，避免這些欄位完全無法刪除。
+                        const actions = document.createElement('div');
+                        actions.className = 'flex justify-end';
+                        const del = document.createElement('button');
+                        del.type = 'button'; del.className = 'px-3 py-1.5 rounded-lg border border-rose-200 bg-rose-50 text-rose-700 text-xs font-bold';
+                        del.textContent = '刪除此項';
+                        del.onclick = () => deletePretripLogicalItem(el);
+                        actions.appendChild(del);
+                        row.appendChild(actions);
+                    }
+                    card.appendChild(row);
+                });
+                fields.appendChild(card);
             });
             renderPretripCustomDescriptions();
+        }
+        function addPretripBlockItem(section) {
+            let list = section.querySelector('ul');
+            if (!list) {
+                // 文件區原本是勾選清單，將新增項目放在該區塊內，不影響其他分類。
+                list = document.createElement('ul');
+                list.className = 'space-y-2 text-sm leading-6 text-slate-600 list-disc pl-5 mt-2';
+                list.dataset.pretripListId = 'documents-added';
+                const content = section.querySelector('.space-y-3.text-sm') || section;
+                content.appendChild(list);
+            }
+            if (!list.dataset.pretripListId) list.dataset.pretripListId = 'block-' + Array.from(document.querySelectorAll('#pretrip-container > section')).indexOf(section);
+            const li = document.createElement('li');
+            li.className = 'pretrip-editable';
+            li.dataset.pretripEditId = 'custom-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7);
+            li.textContent = '請輸入新項目';
+            list.appendChild(li);
+            const saved = getPretripSavedText(); saved[li.dataset.pretripEditId] = li.textContent;
+            try { localStorage.setItem(PRETRIP_TEXT_KEY, JSON.stringify(saved)); } catch (_) {}
+            persistPretripList(list);
+            renderPretripTextEdits();
+            const inputs = Array.from(document.querySelectorAll('#pretrip-cms-fields textarea'));
+            const target = inputs.find(input => input.value === '請輸入新項目');
+            if (target) { target.focus(); target.select(); }
         }
         function persistPretripList(list) {
             const key = 'NZ_TRAVEL_PRETRIP_LIST_' + (list.dataset.pretripListId || 'custom-list');
@@ -761,6 +816,18 @@
             try { localStorage.setItem(PRETRIP_TEXT_KEY, JSON.stringify(saved)); } catch (_) {}
             persistPretripList(list);
             renderPretripTextEdits();
+        }
+        function deletePretripLogicalItem(item) {
+            if (!item || !confirm('確定要刪除此項目嗎？此操作只會影響目前所在的區塊。')) return;
+            const list = item.tagName === 'LI' ? item.parentElement : null;
+            const ids = Array.from(item.querySelectorAll('[data-pretrip-edit-id]')).map(el => el.dataset.pretripEditId);
+            if (item.dataset?.pretripEditId) ids.push(item.dataset.pretripEditId);
+            item.remove();
+            const saved = getPretripSavedText();
+            ids.forEach(id => delete saved[id]);
+            try { localStorage.setItem(PRETRIP_TEXT_KEY, JSON.stringify(saved)); } catch (_) {}
+            if (list && list.tagName === 'UL') persistPretripList(list);
+            renderPretripChecks();
         }
         function movePretripTextItem(key, direction) {
             const elements = Array.from(document.querySelectorAll('#pretrip-container [data-pretrip-edit-id]'));
